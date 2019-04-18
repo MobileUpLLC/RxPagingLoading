@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">RxPLCE</string>
+    <string name="label_paging">RxPaging</string>
+    <string name="label_refreshing">RxRefreshing</string>
+    <string name="label_loading">RxLoading</string>
+    <string name="settings">Settings</string>
+</resources>

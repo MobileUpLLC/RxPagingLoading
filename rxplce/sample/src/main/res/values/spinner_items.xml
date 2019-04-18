@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="repository_settings">
+        <item>Normal</item>
+        <item>Error</item>
+        <item>Empty data</item>
+        <item>Random error</item>
+    </string-array>
+</resources>

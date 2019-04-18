@@ -1,1 +1,2 @@
-include 'rxplce:rxplce'
+include ':rxplce:rxplce'
+include ':rxplce:sample'
