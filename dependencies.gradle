@@ -1,0 +1,23 @@
+ext.versions = [
+
+        'minSdk'             : 21,
+        'compileSdk'         : 28,
+        'targetSdk'          : 28,
+
+        'androidgradlePlugin': '3.4.0',
+        'kotlin'             : '1.3.30',
+
+        'junit'              : '4.12',
+        'rxPm'               : '1.2.4'
+]
+
+ext.libraries = [
+        junit       : "junit:junit:${versions.junit}",
+        kotlinStdLib: "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}",
+        rxPm        : "me.dmdev.rxpm:rxpm:${versions.rxPm}"
+]
+
+ext.gradlePlugins = [
+        android: "com.android.tools.build:gradle:$versions.androidgradlePlugin",
+        kotlin : "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin",
+]
