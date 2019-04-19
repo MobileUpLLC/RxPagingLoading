@@ -6,7 +6,7 @@ import me.dmdev.rxpm.PresentationModel
 import ru.mobileup.rxplce.PagingPmImpl.ActionType
 
 class PagingScreenPmImpl<T>(
-    pagingSource: ((offset: Int, last: T?) -> Single<List<T>>)
+    pagingSource: ((offset: Int, lastPage: PagingPmImpl.Page<T>?) -> Single<PagingPmImpl.Page<T>>)
 ) : PresentationModel(), PagingScreenPm<T> {
 
     override val data = State<List<T>>()

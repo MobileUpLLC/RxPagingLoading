@@ -5,11 +5,13 @@ import io.reactivex.functions.BiFunction
 import me.dmdev.rxpm.PresentationModel
 
 class PagingPmImpl<T>(
-    private val pagingSource: ((offset: Int, last: T?) -> Single<List<T>>)
+    private val pagingSource: ((offset: Int, lastPage: Page<T>?) -> Single<Page<T>>)
 ) : PresentationModel() {
 
     val pagingState = State<PagingState<T>>(PagingState())
     val actions = Action<ActionType>()
+
+    enum class ActionType { REFRESH, LOAD_PAGE }
 
     data class PagingState<T>(
         val internalAction: InternalAction? = null,
@@ -17,8 +19,17 @@ class PagingPmImpl<T>(
         val refreshingError: Throwable? = null,
         val pageLoadingError: Throwable? = null,
         val refreshing: Boolean = false,
-        val pageIsLoading: Boolean = false
-    )
+        val pageIsLoading: Boolean = false,
+        val lastPage: Page<T>? = null
+    ) {
+        val isReachedEnd: Boolean get() = lastPage?.isReachedEnd ?: false
+    }
+
+    interface Page<T> {
+        val list: List<T>
+        val lastItem: T get() = list.last()
+        val isReachedEnd: Boolean
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -32,14 +43,17 @@ class PagingPmImpl<T>(
             )
             .filter { (action, state) ->
                 when (action) {
-                    ActionType.LOAD_PAGE -> state.refreshing.not() && state.pageIsLoading.not()
+                    ActionType.LOAD_PAGE -> {
+                        state.refreshing.not()
+                                && state.pageIsLoading.not()
+                                && state.isReachedEnd.not()
+                    }
                     ActionType.REFRESH -> state.refreshing.not()
                 }
             }
             .switchMap { (action, state) ->
 
                 when (action) {
-
                     ActionType.REFRESH -> {
                         pagingSource(0, null)
                             .toObservable()
@@ -49,12 +63,10 @@ class PagingPmImpl<T>(
                     }
 
                     ActionType.LOAD_PAGE -> {
-                        pagingSource(state.data?.size ?: 0, state.data?.lastOrNull())
+                        pagingSource(state.data?.size ?: 0, state.lastPage)
                             .toObservable()
                             .map<InternalAction> {
-                                InternalAction.PageLoadingSuccess(
-                                    state.data?.plus(it).orEmpty()
-                                )
+                                InternalAction.PageLoadingSuccess(it)
                             }
                             .startWith(InternalAction.StartPageLoading)
                             .onErrorReturn { InternalAction.PageLoadingFail(it) }
@@ -79,11 +91,14 @@ class PagingPmImpl<T>(
                         )
                     }
                     is InternalAction.RefreshSuccess<*> -> {
+
                         @Suppress("UNCHECKED_CAST")
-                        state.copy(
+                        val page = action.page as Page<T>
+
+                        PagingState(
                             internalAction = action,
-                            refreshing = false,
-                            data = action.list as List<T>
+                            data = page.list,
+                            lastPage = page
                         )
                     }
                     InternalAction.StartPageLoading -> {
@@ -102,10 +117,13 @@ class PagingPmImpl<T>(
                     }
                     is InternalAction.PageLoadingSuccess<*> -> {
                         @Suppress("UNCHECKED_CAST")
+                        val page = action.page as Page<T>
+
                         state.copy(
                             internalAction = action,
                             pageIsLoading = false,
-                            data = action.list as List<T>
+                            data = state.data?.plus(page.list),
+                            lastPage = page
                         )
                     }
                 }
@@ -115,16 +133,14 @@ class PagingPmImpl<T>(
             .untilDestroy()
     }
 
-    enum class ActionType { REFRESH, LOAD_PAGE }
-
     sealed class InternalAction {
 
         object StartRefresh : InternalAction()
-        class RefreshSuccess<T>(val list: List<T>) : InternalAction()
+        class RefreshSuccess<T>(val page: Page<T>) : InternalAction()
         class RefreshFail(val error: Throwable) : InternalAction()
 
         object StartPageLoading : InternalAction()
-        class PageLoadingSuccess<T>(val list: List<T>) : InternalAction()
+        class PageLoadingSuccess<T>(val page: Page<T>) : InternalAction()
         class PageLoadingFail(val error: Throwable) : InternalAction()
 
         override fun toString(): String {
