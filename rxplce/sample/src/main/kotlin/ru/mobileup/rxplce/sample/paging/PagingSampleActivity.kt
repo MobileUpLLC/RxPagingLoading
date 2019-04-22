@@ -13,6 +13,9 @@ import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxbinding3.view.visibility
 import kotlinx.android.synthetic.main.activity_paging.*
 import kotlinx.android.synthetic.main.footer_paging.view.*
+import kotlinx.android.synthetic.main.layout_empty_view.*
+import kotlinx.android.synthetic.main.layout_error_view.*
+import kotlinx.android.synthetic.main.layout_progress_view.*
 import me.dmdev.rxpm.base.PmSupportActivity
 import ru.mobileup.rxplce.sample.R
 

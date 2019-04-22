@@ -5,7 +5,7 @@ import ru.mobileup.rxplce.PagingPmImpl
 import ru.mobileup.rxplce.PagingScreenPm
 import ru.mobileup.rxplce.PagingScreenPmImpl
 
-class PagingSamplePm(
+class PagingSamplePm private constructor(
     private val pagingScreenPm: PagingScreenPmImpl<Item>
 ) : PresentationModel(), PagingScreenPm<Item> by pagingScreenPm {
 

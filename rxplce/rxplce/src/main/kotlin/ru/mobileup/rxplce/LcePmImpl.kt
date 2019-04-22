@@ -31,11 +31,24 @@ class LcePmImpl<T> private constructor(
     val dataState = State<DataState<T>>(DataState())
     val refreshes = Action<Unit>()
 
+    interface DataMaybeEmpty {
+        fun isEmpty(): Boolean
+    }
+
     data class DataState<T>(
+        val internalAction: InternalAction? = null,
         val data: T? = null,
         val refreshingError: Throwable? = null,
         val refreshing: Boolean = false
-    )
+    ) {
+        val dataIsEmpty = when (data) {
+            is Collection<*> -> data.isEmpty()
+            is Array<*> -> data.isEmpty()
+            is String -> data.isEmpty()
+            is DataMaybeEmpty -> data.isEmpty()
+            else -> false
+        }
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -65,31 +78,58 @@ class LcePmImpl<T> private constructor(
             .mergeWith(
                 dataChanges
                     ?.map { InternalAction.UpdateData(it) }
+                    ?: Observable.empty()
             )
             .scan(DataState<T>()) { state, action ->
                 when (action) {
                     is InternalAction.StartLoad -> {
-                        state.copy(refreshing = true, refreshingError = null)
+                        state.copy(
+                            internalAction = action,
+                            refreshing = true,
+                            refreshingError = null
+                        )
                     }
                     is InternalAction.LoadSuccess<*> -> {
                         @Suppress("UNCHECKED_CAST")
-                        state.copy(refreshing = false, data = action.data as T)
+                        state.copy(
+                            internalAction = action,
+                            refreshing = false,
+                            data = action.data as T
+                        )
                     }
                     is InternalAction.LoadFail -> {
-                        state.copy(refreshing = false, refreshingError = action.error)
+                        state.copy(
+                            internalAction = action,
+                            refreshing = false,
+                            refreshingError = action.error
+                        )
                     }
                     is InternalAction.StartRefresh -> {
-                        state.copy(refreshing = true, refreshingError = null)
+                        state.copy(
+                            internalAction = action,
+                            refreshing = true,
+                            refreshingError = null
+                        )
                     }
                     is InternalAction.RefreshSuccess -> {
-                        state.copy(refreshing = false)
+                        state.copy(
+                            internalAction = action,
+                            refreshing = false
+                        )
                     }
                     is InternalAction.RefreshFail -> {
-                        state.copy(refreshing = false, refreshingError = action.error)
+                        state.copy(
+                            internalAction = action,
+                            refreshing = false,
+                            refreshingError = action.error
+                        )
                     }
                     is InternalAction.UpdateData<*> -> {
                         @Suppress("UNCHECKED_CAST")
-                        state.copy(data = action.data as T)
+                        state.copy(
+                            internalAction = action,
+                            data = action.data as T
+                        )
                     }
                 }
             }
@@ -99,7 +139,7 @@ class LcePmImpl<T> private constructor(
 
     }
 
-    private sealed class InternalAction {
+    sealed class InternalAction {
         object StartRefresh : InternalAction()
         class RefreshFail(val error: Throwable) : InternalAction()
         object RefreshSuccess : InternalAction()
