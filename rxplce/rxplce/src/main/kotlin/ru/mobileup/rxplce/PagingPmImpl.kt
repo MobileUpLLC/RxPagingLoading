@@ -27,7 +27,7 @@ class PagingPmImpl<T>(
 
     interface Page<T> {
         val list: List<T>
-        val lastItem: T get() = list.last()
+        val lastItem: T? get() = list.lastOrNull()
         val isReachedEnd: Boolean
     }
 
