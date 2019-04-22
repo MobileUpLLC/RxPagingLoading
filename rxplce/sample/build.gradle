@@ -40,6 +40,7 @@ dependencies {
     implementation libraries.recyclerView
 
     implementation libraries.rxPm
+    implementation libraries.rxRelay
     implementation libraries.rxBinding
     implementation libraries.rxBindingSwiperefreshlayout
 

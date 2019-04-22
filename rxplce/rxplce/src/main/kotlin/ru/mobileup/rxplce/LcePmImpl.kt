@@ -48,6 +48,8 @@ class LcePmImpl<T> private constructor(
             is DataMaybeEmpty -> data.isEmpty()
             else -> false
         }
+
+        val dataIsEmptyOrNull = dataIsEmpty || data == null
     }
 
     override fun onCreate() {
@@ -56,7 +58,8 @@ class LcePmImpl<T> private constructor(
         val observable =
             when {
                 refreshData != null -> refreshData
-                    .toObservable<InternalAction>()
+                    .toSingleDefault(Unit)
+                    .toObservable()
                     .map<InternalAction> { InternalAction.RefreshSuccess }
                     .startWith(InternalAction.StartRefresh)
                     .onErrorReturn { InternalAction.RefreshFail(it) }

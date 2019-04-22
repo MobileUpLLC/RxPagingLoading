@@ -1,13 +1,30 @@
 package ru.mobileup.rxplce
 
-import android.util.Log
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import me.dmdev.rxpm.PresentationModel
 
-class LceScreenPmImpl<T>(
-    private val loadSource: Single<T>
+class LceScreenPmImpl<T> private constructor(
+    private val refreshData: Completable?,
+    private val loadData: Single<T>?,
+    private val dataChanges: Observable<T>?
 ) : PresentationModel(), LceScreenPm<T> {
+
+    constructor(loadingData: Single<T>) : this(
+        refreshData = null,
+        loadData = loadingData,
+        dataChanges = null
+    )
+
+    constructor(
+        refreshData: Completable,
+        dataChanges: Observable<T>
+    ) : this(
+        refreshData = refreshData,
+        loadData = null,
+        dataChanges = dataChanges
+    )
 
     override val data = State<T>()
 
@@ -23,7 +40,11 @@ class LceScreenPmImpl<T>(
     override val refreshAction = Action<Unit>()
     override val retryLoadAction = Action<Unit>()
 
-    private val lcePm = LcePmImpl(loadSource)
+    private val lcePm = if (loadData != null) {
+        LcePmImpl(loadData)
+    } else {
+        LcePmImpl(refreshData!!, dataChanges!!)
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -42,25 +63,25 @@ class LceScreenPmImpl<T>(
             .untilDestroy()
 
         lcePm.dataState.observable
-            .map { it.refreshing && it.data == null }
+            .map { it.refreshing && it.dataIsEmptyOrNull }
             .distinctUntilChanged()
             .subscribe(isLoading.consumer)
             .untilDestroy()
 
         lcePm.dataState.observable
-            .map { it.refreshing && it.data != null }
+            .map { it.refreshing && it.dataIsEmptyOrNull.not() }
             .distinctUntilChanged()
             .subscribe(isRefreshing.consumer)
             .untilDestroy()
 
         lcePm.dataState.observable
-            .map { it.data != null && it.refreshingError == null }
+            .map { it.dataIsEmptyOrNull.not() }
             .distinctUntilChanged()
             .subscribe(refreshEnabled.consumer)
             .untilDestroy()
 
         lcePm.dataState.observable
-            .map { it.data != null }
+            .map { it.dataIsEmptyOrNull.not() }
             .distinctUntilChanged()
             .subscribe(contentVisible.consumer)
             .untilDestroy()
@@ -72,10 +93,7 @@ class LceScreenPmImpl<T>(
             .untilDestroy()
 
         lcePm.dataState.observable
-            .map { it.refreshingError != null && it.data == null }
-            .doOnNext {
-                Log.d("DDD", "ERROR VISIBLE = $it")
-            }
+            .map { it.refreshingError != null && it.dataIsEmptyOrNull }
             .distinctUntilChanged()
             .subscribe(errorViewVisible.consumer)
             .untilDestroy()
