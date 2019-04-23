@@ -23,7 +23,7 @@ class LoadingSampleActivity : PmSupportActivity<LoadingSamplePm>() {
 
     override fun onBindPresentationModel(pm: LoadingSamplePm) {
 
-        pm.data bindTo contentView::setText
+        pm.data bindTo { contentView.text = it.text }
 
         pm.isLoading bindTo progressBar.visibility()
 

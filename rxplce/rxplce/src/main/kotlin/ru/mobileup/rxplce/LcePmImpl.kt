@@ -41,10 +41,10 @@ class LcePmImpl<T> private constructor(
         val refreshingError: Throwable? = null,
         val refreshing: Boolean = false
     ) {
+
         val dataIsEmpty = when (data) {
             is Collection<*> -> data.isEmpty()
             is Array<*> -> data.isEmpty()
-            is String -> data.isEmpty()
             is DataMaybeEmpty -> data.isEmpty()
             else -> false
         }
