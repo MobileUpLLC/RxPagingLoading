@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import androidx.appcompat.app.AlertDialog
 import com.jakewharton.rxbinding3.swiperefreshlayout.refreshes
 import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxbinding3.view.visibility
@@ -50,6 +51,13 @@ class RefreshingSampleActivity : PmSupportActivity<RefreshingSamplePm>() {
         pm.contentVisible bindTo contentView.visibility()
         pm.emptyViewVisible bindTo emptyView.visibility()
         pm.errorViewVisible bindTo errorView.visibility()
+
+        pm.errorDialog bindTo { message, _ ->
+            AlertDialog.Builder(this)
+                .setMessage(message)
+                .setPositiveButton("ok", null)
+                .create()
+        }
 
         swipeRefreshLayout.refreshes() bindTo pm.refreshAction
         retryButton.clicks() bindTo pm.retryLoadAction

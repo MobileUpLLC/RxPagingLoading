@@ -40,6 +40,8 @@ class LceScreenPmImpl<T> private constructor(
     override val refreshAction = Action<Unit>()
     override val retryLoadAction = Action<Unit>()
 
+    val showError = Command<Throwable>()
+
     private val lcePm = if (loadData != null) {
         LcePmImpl(loadData)
     } else {
@@ -96,6 +98,13 @@ class LceScreenPmImpl<T> private constructor(
             .map { it.refreshingError != null && it.dataIsEmptyOrNull }
             .distinctUntilChanged()
             .subscribe(errorViewVisible.consumer)
+            .untilDestroy()
+
+        lcePm.dataState.observable
+            .filter { it.data != null && it.refreshingError != null }
+            .map { it.refreshingError!! }
+            .distinctUntilChanged()
+            .subscribe(showError.consumer)
             .untilDestroy()
     }
 }
