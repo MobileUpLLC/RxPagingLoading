@@ -58,6 +58,8 @@ class PagingSampleActivity : PmSupportActivity<PagingSamplePm>() {
 
         pm.data bindTo { itemsAdapter.submitList(it) }
 
+        pm.scrollToTop bindTo { recyclerView?.smoothScrollToPosition(0) }
+
         pm.pageIsLoading bindTo itemsAdapter.footerView.progressBar.visibility()
         pm.pageErrorVisible bindTo itemsAdapter.footerView.pageLoadingErrorText.visibility()
         pm.pageErrorVisible bindTo itemsAdapter.footerView.retryButton.visibility()

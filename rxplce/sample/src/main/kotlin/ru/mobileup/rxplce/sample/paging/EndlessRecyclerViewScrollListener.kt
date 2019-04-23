@@ -13,11 +13,12 @@ class EndlessRecyclerViewScrollListener(
     }
 
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+
         val limit = recyclerView.layoutManager!!.itemCount
         val lastVisibleItem =
             (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
 
-        if (limit - lastVisibleItem < difference) {
+        if (dy > 0 && limit - lastVisibleItem < difference) {
             onLoadMore.invoke(Unit)
         }
     }

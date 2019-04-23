@@ -22,6 +22,8 @@ class PagingScreenPmImpl<T>(
     override val errorViewVisible = State<Boolean>()
     override val pageErrorVisible = State<Boolean>()
 
+    override val scrollToTop = Command<Unit>()
+
     override val refreshAction = Action<Unit>()
     override val nextPageAction = Action<Unit>()
     override val retryLoadAction = Action<Unit>()
@@ -36,7 +38,9 @@ class PagingScreenPmImpl<T>(
 
         Observable.merge(
             refreshAction.observable.map { ActionType.REFRESH },
-            nextPageAction.observable.map { ActionType.LOAD_PAGE },
+            nextPageAction.observable
+                .filter { pagingPm.pagingState.value.pageLoadingError == null }
+                .map { ActionType.LOAD_PAGE },
             retryLoadAction.observable.map { ActionType.REFRESH },
             retryLoadNextPageAction.observable.map { ActionType.LOAD_PAGE }
         )
@@ -48,23 +52,28 @@ class PagingScreenPmImpl<T>(
             .filter { it.data != null }
             .map { it.data!! }
             .distinctUntilChanged { l1: List<T>, l2: List<T> -> l1 === l2 }
-            .subscribe(data.consumer)
+            .subscribe {
+                if (it.size <= data.valueOrNull?.size ?: 0) {
+                    scrollToTop.consumer.accept(Unit)
+                }
+                data.consumer.accept(it)
+            }
             .untilDestroy()
 
         pagingPm.pagingState.observable
-            .map { it.refreshing && it.data?.isEmpty() ?: true }
+            .map { it.refreshing && it.data == null }
             .distinctUntilChanged()
             .subscribe(isLoading.consumer)
             .untilDestroy()
 
         pagingPm.pagingState.observable
-            .map { it.refreshing && it.data?.isNotEmpty() ?: false }
+            .map { it.refreshing && it.data != null }
             .distinctUntilChanged()
             .subscribe(isRefreshing.consumer)
             .untilDestroy()
 
         pagingPm.pagingState.observable
-            .map { it.data != null && it.refreshingError == null }
+            .map { it.data != null }
             .distinctUntilChanged()
             .subscribe(refreshEnabled.consumer)
             .untilDestroy()

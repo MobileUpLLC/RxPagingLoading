@@ -17,6 +17,8 @@ interface PagingScreenPm<T> {
     val errorViewVisible: PresentationModel.State<Boolean>
     val pageErrorVisible: PresentationModel.State<Boolean>
 
+    val scrollToTop: PresentationModel.Command<Unit>
+
     val refreshAction: PresentationModel.Action<Unit>
     val nextPageAction: PresentationModel.Action<Unit>
     val retryLoadAction: PresentationModel.Action<Unit>
