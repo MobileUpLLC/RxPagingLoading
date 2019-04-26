@@ -14,7 +14,6 @@ class PagingPmImpl<T>(
     enum class ActionType { REFRESH, LOAD_PAGE }
 
     data class PagingState<T>(
-        val internalAction: InternalAction? = null,
         val data: List<T>? = null,
         val refreshingError: Throwable? = null,
         val pageLoadingError: Throwable? = null,
@@ -77,7 +76,6 @@ class PagingPmImpl<T>(
                 when (action) {
                     InternalAction.StartRefresh -> {
                         state.copy(
-                            internalAction = action,
                             refreshing = true,
                             pageIsLoading = false,
                             refreshingError = null
@@ -85,7 +83,6 @@ class PagingPmImpl<T>(
                     }
                     is InternalAction.RefreshFail -> {
                         state.copy(
-                            internalAction = action,
                             refreshing = false,
                             refreshingError = action.error
                         )
@@ -96,21 +93,18 @@ class PagingPmImpl<T>(
                         val page = action.page as Page<T>
 
                         PagingState(
-                            internalAction = action,
                             data = page.list,
                             lastPage = page
                         )
                     }
                     InternalAction.StartPageLoading -> {
                         state.copy(
-                            internalAction = action,
                             pageIsLoading = true,
                             pageLoadingError = null
                         )
                     }
                     is InternalAction.PageLoadingFail -> {
                         state.copy(
-                            internalAction = action,
                             pageIsLoading = false,
                             pageLoadingError = action.error
                         )
@@ -120,7 +114,6 @@ class PagingPmImpl<T>(
                         val page = action.page as Page<T>
 
                         state.copy(
-                            internalAction = action,
                             pageIsLoading = false,
                             data = state.data?.plus(page.list),
                             lastPage = page
@@ -133,7 +126,7 @@ class PagingPmImpl<T>(
             .untilDestroy()
     }
 
-    sealed class InternalAction {
+    private sealed class InternalAction {
 
         object StartRefresh : InternalAction()
         class RefreshSuccess<T>(val page: Page<T>) : InternalAction()
