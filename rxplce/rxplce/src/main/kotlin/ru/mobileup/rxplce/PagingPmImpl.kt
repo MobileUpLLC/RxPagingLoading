@@ -1,39 +1,30 @@
 package ru.mobileup.rxplce
 
+import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import me.dmdev.rxpm.PresentationModel
+import ru.mobileup.rxplce.PagingPm.Page
+import ru.mobileup.rxplce.PagingPm.PagingState
 
 class PagingPmImpl<T>(
     private val pagingSource: ((offset: Int, lastPage: Page<T>?) -> Single<Page<T>>)
-) : PresentationModel() {
+) : PresentationModel(), PagingPm<T> {
 
-    val pagingState = State<PagingState<T>>(PagingState())
-    val actions = Action<ActionType>()
+    override val pagingState = State<PagingState<T>>(PagingState())
+    override val refreshes = Action<Unit>()
+    override val loadNextPage = Action<Unit>()
 
-    enum class ActionType { REFRESH, LOAD_PAGE }
-
-    data class PagingState<T>(
-        val data: List<T>? = null,
-        val refreshingError: Throwable? = null,
-        val pageLoadingError: Throwable? = null,
-        val refreshing: Boolean = false,
-        val pageIsLoading: Boolean = false,
-        val lastPage: Page<T>? = null
-    ) {
-        val isReachedEnd: Boolean get() = lastPage?.isReachedEnd ?: false
-    }
-
-    interface Page<T> {
-        val list: List<T>
-        val lastItem: T? get() = list.lastOrNull()
-        val isReachedEnd: Boolean
-    }
+    private enum class ActionType { REFRESH, LOAD_PAGE }
 
     override fun onCreate() {
         super.onCreate()
 
-        actions.observable
+        Observable
+            .merge(
+                refreshes.observable.map { ActionType.REFRESH },
+                loadNextPage.observable.map { ActionType.LOAD_PAGE }
+            )
             .withLatestFrom(
                 pagingState.observable,
                 BiFunction { action: ActionType, state: PagingState<T> ->

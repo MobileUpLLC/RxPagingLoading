@@ -3,10 +3,10 @@ package ru.mobileup.rxplce
 import io.reactivex.Observable
 import io.reactivex.Single
 import me.dmdev.rxpm.PresentationModel
-import ru.mobileup.rxplce.PagingPmImpl.ActionType
+import ru.mobileup.rxplce.PagingPm.Page
 
 class PagingScreenPmImpl<T>(
-    pagingSource: ((offset: Int, lastPage: PagingPmImpl.Page<T>?) -> Single<PagingPmImpl.Page<T>>)
+    pagingSource: ((offset: Int, lastPage: Page<T>?) -> Single<Page<T>>)
 ) : PresentationModel(), PagingScreenPm<T> {
 
     override val data = State<List<T>>()
@@ -36,16 +36,22 @@ class PagingScreenPmImpl<T>(
 
         pagingPm.attachToParent(this)
 
-        Observable.merge(
-            refreshAction.observable.map { ActionType.REFRESH },
-            nextPageAction.observable
-                .filter { pagingPm.pagingState.value.pageLoadingError == null }
-                .map { ActionType.LOAD_PAGE },
-            retryLoadAction.observable.map { ActionType.REFRESH },
-            retryLoadNextPageAction.observable.map { ActionType.LOAD_PAGE }
-        )
-            .startWith(ActionType.REFRESH)
-            .subscribe(pagingPm.actions.consumer)
+        Observable
+            .merge(
+                refreshAction.observable,
+                retryLoadAction.observable
+            )
+            .startWith(Unit)
+            .subscribe(pagingPm.refreshes.consumer)
+            .untilDestroy()
+
+        Observable
+            .merge(
+                nextPageAction.observable,
+                retryLoadNextPageAction.observable
+            )
+            .filter { pagingPm.pagingState.value.pageLoadingError == null }
+            .subscribe(pagingPm.loadNextPage.consumer)
             .untilDestroy()
 
         pagingPm.pagingState.observable

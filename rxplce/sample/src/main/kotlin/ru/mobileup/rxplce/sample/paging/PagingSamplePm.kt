@@ -1,7 +1,7 @@
 package ru.mobileup.rxplce.sample.paging
 
 import me.dmdev.rxpm.PresentationModel
-import ru.mobileup.rxplce.PagingPmImpl
+import ru.mobileup.rxplce.PagingPm
 import ru.mobileup.rxplce.PagingScreenPm
 import ru.mobileup.rxplce.PagingScreenPmImpl
 
@@ -12,7 +12,7 @@ class PagingSamplePm private constructor(
     class PageInfo(
         override val list: List<Item>,
         override val isReachedEnd: Boolean
-    ) : PagingPmImpl.Page<Item>
+    ) : PagingPm.Page<Item>
 
     companion object {
         fun createInstance(repository: ItemsRepository): PagingSamplePm {
