@@ -1,12 +1,10 @@
 package ru.mobileup.rxplce
 
 import io.reactivex.Observable
-import io.reactivex.Single
 import me.dmdev.rxpm.PresentationModel
-import ru.mobileup.rxplce.PagingPm.Page
 
 class PagingScreenPmImpl<T>(
-    pagingSource: ((offset: Int, lastPage: Page<T>?) -> Single<Page<T>>)
+    private val pagingPm: PagingPm<T>
 ) : PresentationModel(), PagingScreenPm<T> {
 
     override val data = State<List<T>>()
@@ -29,12 +27,12 @@ class PagingScreenPmImpl<T>(
     override val retryLoadAction = Action<Unit>()
     override val retryLoadNextPageAction = Action<Unit>()
 
-    private val pagingPm = PagingPmImpl(pagingSource)
-
     override fun onCreate() {
         super.onCreate()
 
-        pagingPm.attachToParent(this)
+        if (pagingPm is PresentationModel) {
+            pagingPm.attachToParent(this)
+        }
 
         Observable
             .merge(
