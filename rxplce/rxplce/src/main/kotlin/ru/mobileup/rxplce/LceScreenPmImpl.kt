@@ -55,7 +55,7 @@ class LceScreenPmImpl<T>(
 
     val showError = Command<Throwable>()
 
-    private val screenStateChanges = lcePm.dataState.observable.share().map {
+    private val screenStateChanges = lcePm.dataState.observable.map {
         stateMapper(it)
     }
 

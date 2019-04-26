@@ -17,6 +17,15 @@ interface PagingPm<T> {
         val lastPage: Page<T>? = null
     ) {
         val isReachedEnd: Boolean get() = lastPage?.isReachedEnd ?: false
+
+        fun dataIsEmpty(): Boolean {
+            return when (data) {
+                is Collection<*> -> data.isEmpty()
+                is Array<*> -> data.isEmpty()
+                is LcePm.DataMaybeEmpty -> data.isEmpty()
+                else -> false
+            }
+        }
     }
 
     interface Page<T> {
