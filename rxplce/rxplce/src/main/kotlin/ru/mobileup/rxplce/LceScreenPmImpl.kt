@@ -1,15 +1,13 @@
 package ru.mobileup.rxplce
 
-import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Single
 import me.dmdev.rxpm.PresentationModel
 import ru.mobileup.rxplce.LceScreenPmImpl.ScreenState
 
-typealias StateMapper<T> = ((lceState: LcePmImpl.DataState<T>) -> ScreenState<T>)
+typealias StateMapper<T> = ((lceState: LcePm.DataState<T>) -> ScreenState<T>)
 
 class DefaultStateMapper<T> : StateMapper<T> {
-    override fun invoke(lceState: LcePmImpl.DataState<T>): ScreenState<T> {
+    override fun invoke(lceState: LcePm.DataState<T>): ScreenState<T> {
         return object : ScreenState<T> {
             override val data: T?
                 get() = lceState.data
@@ -24,10 +22,10 @@ class DefaultStateMapper<T> : StateMapper<T> {
                 get() = contentIsVisible || emptyViewIsVisible || errorViewIsVisible
 
             override val contentIsVisible: Boolean
-                get() = lceState.data != null && lceState.dataIsEmpty.not()
+                get() = lceState.data != null && lceState.dataIsEmpty().not()
 
             override val emptyViewIsVisible: Boolean
-                get() = lceState.data != null && lceState.dataIsEmpty
+                get() = lceState.data != null && lceState.dataIsEmpty()
 
             override val errorViewIsVisible: Boolean
                 get() = data == null && lceState.refreshingError != null
@@ -36,33 +34,10 @@ class DefaultStateMapper<T> : StateMapper<T> {
     }
 }
 
-class LceScreenPmImpl<T> private constructor(
-    private val stateMapper: StateMapper<T>,
-    private val refreshData: Completable?,
-    private val loadData: Single<T>?,
-    private val dataChanges: Observable<T>?
+class LceScreenPmImpl<T>(
+    private val lcePm: LcePm<T>,
+    private val stateMapper: StateMapper<T> = DefaultStateMapper()
 ) : PresentationModel(), LceScreenPm<T> {
-
-    constructor(
-        loadingData: Single<T>,
-        stateMapper: StateMapper<T> = DefaultStateMapper()
-    ) : this(
-        stateMapper,
-        refreshData = null,
-        loadData = loadingData,
-        dataChanges = null
-    )
-
-    constructor(
-        refreshData: Completable,
-        dataChanges: Observable<T>,
-        stateMapper: StateMapper<T> = DefaultStateMapper()
-    ) : this(
-        stateMapper,
-        refreshData = refreshData,
-        loadData = null,
-        dataChanges = dataChanges
-    )
 
     override val data = State<T>()
 
@@ -80,13 +55,7 @@ class LceScreenPmImpl<T> private constructor(
 
     val showError = Command<Throwable>()
 
-    private val lcePm = if (loadData != null) {
-        LcePmImpl(loadData)
-    } else {
-        LcePmImpl(refreshData!!, dataChanges!!)
-    }
-
-    private val screenStateChanges = lcePm.dataState.observable.map {
+    private val screenStateChanges = lcePm.dataState.observable.share().map {
         stateMapper(it)
     }
 
@@ -103,7 +72,9 @@ class LceScreenPmImpl<T> private constructor(
     override fun onCreate() {
         super.onCreate()
 
-        lcePm.attachToParent(this)
+        if (lcePm is PresentationModel) {
+            lcePm.attachToParent(this)
+        }
 
         Observable.merge(refreshAction.observable, retryLoadAction.observable)
             .startWith(Unit)

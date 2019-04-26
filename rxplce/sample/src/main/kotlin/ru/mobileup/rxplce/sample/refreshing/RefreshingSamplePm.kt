@@ -2,6 +2,7 @@ package ru.mobileup.rxplce.sample.refreshing
 
 import me.dmdev.rxpm.PresentationModel
 import me.dmdev.rxpm.widget.dialogControl
+import ru.mobileup.rxplce.LcePmImpl
 import ru.mobileup.rxplce.LceScreenPm
 import ru.mobileup.rxplce.LceScreenPmImpl
 
@@ -13,8 +14,10 @@ class RefreshingSamplePm private constructor(
         fun createInstance(repository: RandomNumbersRepository): RefreshingSamplePm {
             return RefreshingSamplePm(
                 LceScreenPmImpl(
-                    refreshData = repository.refreshNumbers(),
-                    dataChanges = repository.numbersChanges()
+                    LcePmImpl(
+                        refreshData = repository.refreshNumbers(),
+                        dataChanges = repository.numbersChanges()
+                    )
                 )
             )
         }
@@ -24,6 +27,7 @@ class RefreshingSamplePm private constructor(
 
     override fun onCreate() {
         super.onCreate()
+
         lceScreenPm.attachToParent(this)
 
         lceScreenPm.showError.observable
