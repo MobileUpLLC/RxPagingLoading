@@ -14,7 +14,9 @@ ext.versions = [
         'rxBinding'          : '3.0.0-alpha2',
 
         'appCompat'          : '1.1.0-alpha04',
-        'recyclerView'       : '1.1.0-alpha04'
+        'recyclerView'       : '1.1.0-alpha04',
+
+        'mockito'      : '2.1.0'
 ]
 
 ext.libraries = [
@@ -27,7 +29,10 @@ ext.libraries = [
         rxPm                       : "me.dmdev.rxpm:rxpm:${versions.rxPm}",
         rxRelay                    : "com.jakewharton.rxrelay2:rxrelay:${versions.rxRelay}",
         rxBinding                  : "com.jakewharton.rxbinding3:rxbinding:${versions.rxBinding}",
-        rxBindingSwiperefreshlayout: "com.jakewharton.rxbinding3:rxbinding-swiperefreshlayout:${versions.rxBinding}"
+        rxBindingSwiperefreshlayout: "com.jakewharton.rxbinding3:rxbinding-swiperefreshlayout:${versions.rxBinding}",
+
+        junitKotlin                : "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin",
+        mockitoKotlin              : "com.nhaarman.mockitokotlin2:mockito-kotlin:$versions.mockito"
 ]
 
 ext.gradlePlugins = [

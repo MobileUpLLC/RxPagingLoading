@@ -23,7 +23,10 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    testImplementation libraries.junit
+    testImplementation libraries.junitKotlin
+    testImplementation libraries.mockitoKotlin
     implementation libraries.kotlinStdLib
-    compileOnly libraries.rxPm
+    implementation libraries.rxPm
+    testImplementation libraries.rxPm
+    testImplementation libraries.rxRelay
 }
