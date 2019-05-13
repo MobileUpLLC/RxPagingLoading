@@ -5,13 +5,14 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import me.dmdev.rxpm.PresentationModel
+import ru.mobileup.rxplce.LcePm.DataState
 
 
 class LcePmImpl<T> private constructor(
     private val refreshData: Completable?,
     private val loadData: Single<T>?,
     private val dataChanges: Observable<T>?
-) : PresentationModel() {
+) : PresentationModel(), LcePm<T> {
 
     constructor(loadingData: Single<T>) : this(
         refreshData = null,
@@ -28,29 +29,8 @@ class LcePmImpl<T> private constructor(
         dataChanges = dataChanges
     )
 
-    val dataState = State<DataState<T>>(DataState())
-    val refreshes = Action<Unit>()
-
-    interface DataMaybeEmpty {
-        fun isEmpty(): Boolean
-    }
-
-    data class DataState<T>(
-        val internalAction: InternalAction? = null,
-        val data: T? = null,
-        val refreshingError: Throwable? = null,
-        val refreshing: Boolean = false
-    ) {
-
-        val dataIsEmpty = when (data) {
-            is Collection<*> -> data.isEmpty()
-            is Array<*> -> data.isEmpty()
-            is DataMaybeEmpty -> data.isEmpty()
-            else -> false
-        }
-
-        val dataIsEmptyOrNull = dataIsEmpty || data == null
-    }
+    override val dataState = State<DataState<T>>(DataState())
+    override val refreshes = Action<Unit>()
 
     override fun onCreate() {
         super.onCreate()
@@ -87,7 +67,6 @@ class LcePmImpl<T> private constructor(
                 when (action) {
                     is InternalAction.StartLoad -> {
                         state.copy(
-                            internalAction = action,
                             refreshing = true,
                             refreshingError = null
                         )
@@ -95,34 +74,29 @@ class LcePmImpl<T> private constructor(
                     is InternalAction.LoadSuccess<*> -> {
                         @Suppress("UNCHECKED_CAST")
                         state.copy(
-                            internalAction = action,
                             refreshing = false,
                             data = action.data as T
                         )
                     }
                     is InternalAction.LoadFail -> {
                         state.copy(
-                            internalAction = action,
                             refreshing = false,
                             refreshingError = action.error
                         )
                     }
                     is InternalAction.StartRefresh -> {
                         state.copy(
-                            internalAction = action,
                             refreshing = true,
                             refreshingError = null
                         )
                     }
                     is InternalAction.RefreshSuccess -> {
                         state.copy(
-                            internalAction = action,
                             refreshing = false
                         )
                     }
                     is InternalAction.RefreshFail -> {
                         state.copy(
-                            internalAction = action,
                             refreshing = false,
                             refreshingError = action.error
                         )
@@ -130,7 +104,6 @@ class LcePmImpl<T> private constructor(
                     is InternalAction.UpdateData<*> -> {
                         @Suppress("UNCHECKED_CAST")
                         state.copy(
-                            internalAction = action,
                             data = action.data as T
                         )
                     }
@@ -142,7 +115,7 @@ class LcePmImpl<T> private constructor(
 
     }
 
-    sealed class InternalAction {
+    private sealed class InternalAction {
         object StartRefresh : InternalAction()
         class RefreshFail(val error: Throwable) : InternalAction()
         object RefreshSuccess : InternalAction()

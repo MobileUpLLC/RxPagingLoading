@@ -1,12 +1,41 @@
 package ru.mobileup.rxplce
 
 import io.reactivex.Observable
-import io.reactivex.Single
 import me.dmdev.rxpm.PresentationModel
-import ru.mobileup.rxplce.PagingPmImpl.ActionType
+
+typealias PagingStateMapper<T> = ((pagingState: PagingPm.PagingState<T>) -> PagingScreenPmImpl.ScreenState<T>)
+
+class DefaultPagingStateMapper<T> : PagingStateMapper<T> {
+    override fun invoke(pagingState: PagingPm.PagingState<T>): PagingScreenPmImpl.ScreenState<T> {
+        return object : PagingScreenPmImpl.ScreenState<T> {
+            override val data: List<T>?
+                get() = pagingState.data
+
+            override val isLoading: Boolean
+                get() = pagingState.data == null && pagingState.refreshing
+
+            override val isRefreshing: Boolean
+                get() = pagingState.data != null && pagingState.refreshing
+
+            override val refreshEnabled: Boolean
+                get() = contentIsVisible || emptyViewIsVisible || errorViewIsVisible
+
+            override val contentIsVisible: Boolean
+                get() = pagingState.data != null && pagingState.dataIsEmpty().not()
+
+            override val emptyViewIsVisible: Boolean
+                get() = pagingState.data != null && pagingState.dataIsEmpty()
+
+            override val errorViewIsVisible: Boolean
+                get() = data == null && pagingState.refreshingError != null
+
+        }
+    }
+}
 
 class PagingScreenPmImpl<T>(
-    pagingSource: ((offset: Int, lastPage: PagingPmImpl.Page<T>?) -> Single<PagingPmImpl.Page<T>>)
+    private val pagingPm: PagingPm<T>,
+    private val stateMapper: PagingStateMapper<T> = DefaultPagingStateMapper()
 ) : PresentationModel(), PagingScreenPm<T> {
 
     override val data = State<List<T>>()
@@ -29,26 +58,46 @@ class PagingScreenPmImpl<T>(
     override val retryLoadAction = Action<Unit>()
     override val retryLoadNextPageAction = Action<Unit>()
 
-    private val pagingPm = PagingPmImpl(pagingSource)
+    private val screenStateChanges = pagingPm.pagingState.observable.map {
+        stateMapper(it)
+    }
+
+    interface ScreenState<T> {
+        val data: List<T>?
+        val isLoading: Boolean
+        val isRefreshing: Boolean
+        val refreshEnabled: Boolean
+        val contentIsVisible: Boolean
+        val emptyViewIsVisible: Boolean
+        val errorViewIsVisible: Boolean
+    }
 
     override fun onCreate() {
         super.onCreate()
 
-        pagingPm.attachToParent(this)
+        if (pagingPm is PresentationModel) {
+            pagingPm.attachToParent(this)
+        }
 
-        Observable.merge(
-            refreshAction.observable.map { ActionType.REFRESH },
-            nextPageAction.observable
-                .filter { pagingPm.pagingState.value.pageLoadingError == null }
-                .map { ActionType.LOAD_PAGE },
-            retryLoadAction.observable.map { ActionType.REFRESH },
-            retryLoadNextPageAction.observable.map { ActionType.LOAD_PAGE }
-        )
-            .startWith(ActionType.REFRESH)
-            .subscribe(pagingPm.actions.consumer)
+        Observable
+            .merge(
+                refreshAction.observable,
+                retryLoadAction.observable
+            )
+            .startWith(Unit)
+            .subscribe(pagingPm.refreshes.consumer)
             .untilDestroy()
 
-        pagingPm.pagingState.observable
+        Observable
+            .merge(
+                nextPageAction.observable,
+                retryLoadNextPageAction.observable
+            )
+            .filter { pagingPm.pagingState.value.pageLoadingError == null }
+            .subscribe(pagingPm.loadNextPage.consumer)
+            .untilDestroy()
+
+        screenStateChanges
             .filter { it.data != null }
             .map { it.data!! }
             .distinctUntilChanged { l1: List<T>, l2: List<T> -> l1 === l2 }
@@ -60,20 +109,20 @@ class PagingScreenPmImpl<T>(
             }
             .untilDestroy()
 
-        pagingPm.pagingState.observable
-            .map { it.refreshing && it.data == null }
+        screenStateChanges
+            .map { it.isLoading }
             .distinctUntilChanged()
             .subscribe(isLoading.consumer)
             .untilDestroy()
 
-        pagingPm.pagingState.observable
-            .map { it.refreshing && it.data != null }
+        screenStateChanges
+            .map { it.isRefreshing }
             .distinctUntilChanged()
             .subscribe(isRefreshing.consumer)
             .untilDestroy()
 
-        pagingPm.pagingState.observable
-            .map { it.data != null }
+        screenStateChanges
+            .map { it.refreshEnabled }
             .distinctUntilChanged()
             .subscribe(refreshEnabled.consumer)
             .untilDestroy()
@@ -84,20 +133,20 @@ class PagingScreenPmImpl<T>(
             .subscribe(pageIsLoading.consumer)
             .untilDestroy()
 
-        pagingPm.pagingState.observable
-            .map { it.data?.isNotEmpty() ?: false }
+        screenStateChanges
+            .map { it.contentIsVisible }
             .distinctUntilChanged()
             .subscribe(contentVisible.consumer)
             .untilDestroy()
 
-        pagingPm.pagingState.observable
-            .map { it.data?.isEmpty() ?: false && it.refreshingError == null && it.refreshing.not() }
+        screenStateChanges
+            .map { it.emptyViewIsVisible }
             .distinctUntilChanged()
             .subscribe(emptyViewVisible.consumer)
             .untilDestroy()
 
-        pagingPm.pagingState.observable
-            .map { it.refreshingError != null && it.data?.isEmpty() ?: true }
+        screenStateChanges
+            .map { it.errorViewIsVisible }
             .distinctUntilChanged()
             .subscribe(errorViewVisible.consumer)
             .untilDestroy()

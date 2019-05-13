@@ -1,30 +1,43 @@
 package ru.mobileup.rxplce
 
-import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Single
 import me.dmdev.rxpm.PresentationModel
+import ru.mobileup.rxplce.LceScreenPmImpl.ScreenState
 
-class LceScreenPmImpl<T> private constructor(
-    private val refreshData: Completable?,
-    private val loadData: Single<T>?,
-    private val dataChanges: Observable<T>?
+typealias StateMapper<T> = ((lceState: LcePm.DataState<T>) -> ScreenState<T>)
+
+class DefaultStateMapper<T> : StateMapper<T> {
+    override fun invoke(lceState: LcePm.DataState<T>): ScreenState<T> {
+        return object : ScreenState<T> {
+            override val data: T?
+                get() = lceState.data
+
+            override val isLoading: Boolean
+                get() = lceState.data == null && lceState.refreshing
+
+            override val isRefreshing: Boolean
+                get() = lceState.data != null && lceState.refreshing
+
+            override val refreshEnabled: Boolean
+                get() = contentIsVisible || emptyViewIsVisible || errorViewIsVisible
+
+            override val contentIsVisible: Boolean
+                get() = lceState.data != null && lceState.dataIsEmpty().not()
+
+            override val emptyViewIsVisible: Boolean
+                get() = lceState.data != null && lceState.dataIsEmpty()
+
+            override val errorViewIsVisible: Boolean
+                get() = data == null && lceState.refreshingError != null
+
+        }
+    }
+}
+
+class LceScreenPmImpl<T>(
+    private val lcePm: LcePm<T>,
+    private val stateMapper: StateMapper<T> = DefaultStateMapper()
 ) : PresentationModel(), LceScreenPm<T> {
-
-    constructor(loadingData: Single<T>) : this(
-        refreshData = null,
-        loadData = loadingData,
-        dataChanges = null
-    )
-
-    constructor(
-        refreshData: Completable,
-        dataChanges: Observable<T>
-    ) : this(
-        refreshData = refreshData,
-        loadData = null,
-        dataChanges = dataChanges
-    )
 
     override val data = State<T>()
 
@@ -42,60 +55,70 @@ class LceScreenPmImpl<T> private constructor(
 
     val showError = Command<Throwable>()
 
-    private val lcePm = if (loadData != null) {
-        LcePmImpl(loadData)
-    } else {
-        LcePmImpl(refreshData!!, dataChanges!!)
+    private val screenStateChanges = lcePm.dataState.observable.map {
+        stateMapper(it)
+    }
+
+    interface ScreenState<T> {
+        val data: T?
+        val isLoading: Boolean
+        val isRefreshing: Boolean
+        val refreshEnabled: Boolean
+        val contentIsVisible: Boolean
+        val emptyViewIsVisible: Boolean
+        val errorViewIsVisible: Boolean
     }
 
     override fun onCreate() {
         super.onCreate()
 
-        lcePm.attachToParent(this)
+        if (lcePm is PresentationModel) {
+            lcePm.attachToParent(this)
+        }
 
         Observable.merge(refreshAction.observable, retryLoadAction.observable)
             .startWith(Unit)
             .subscribe(lcePm.refreshes.consumer)
             .untilDestroy()
 
-        lcePm.dataState.observable
+        screenStateChanges
             .filter { it.data != null }
             .map { it.data!! }
             .subscribe(data.consumer)
             .untilDestroy()
 
-        lcePm.dataState.observable
-            .map { it.refreshing && it.dataIsEmptyOrNull }
+        screenStateChanges
+            .map { it.isLoading }
             .distinctUntilChanged()
             .subscribe(isLoading.consumer)
             .untilDestroy()
 
-        lcePm.dataState.observable
-            .map { it.refreshing && it.dataIsEmptyOrNull.not() }
+        screenStateChanges
+            .map { it.isRefreshing }
             .distinctUntilChanged()
             .subscribe(isRefreshing.consumer)
             .untilDestroy()
 
-        lcePm.dataState.observable
-            .map { it.dataIsEmptyOrNull.not() }
+        screenStateChanges
+            .map { it.refreshEnabled }
             .distinctUntilChanged()
             .subscribe(refreshEnabled.consumer)
             .untilDestroy()
 
-        lcePm.dataState.observable
-            .map { it.dataIsEmptyOrNull.not() }
+        screenStateChanges
+            .map { it.contentIsVisible }
             .distinctUntilChanged()
             .subscribe(contentVisible.consumer)
             .untilDestroy()
 
-        lcePm.dataState.observable
-            .map { it.dataIsEmpty && it.refreshingError == null && it.refreshing.not() }
+        screenStateChanges
+            .map { it.emptyViewIsVisible }
             .distinctUntilChanged()
             .subscribe(emptyViewVisible.consumer)
             .untilDestroy()
 
-        lcePm.dataState.observable
-            .map { it.refreshingError != null && it.dataIsEmptyOrNull }
+        screenStateChanges
+            .map { it.errorViewIsVisible }
             .distinctUntilChanged()
             .subscribe(errorViewVisible.consumer)
             .untilDestroy()
