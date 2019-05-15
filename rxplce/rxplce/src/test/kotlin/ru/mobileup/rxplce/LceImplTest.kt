@@ -3,15 +3,13 @@ package ru.mobileup.rxplce
 import com.jakewharton.rxrelay2.BehaviorRelay
 import io.reactivex.Completable
 import io.reactivex.Single
-import me.dmdev.rxpm.PresentationModel.Lifecycle.CREATED
-import me.dmdev.rxpm.test.PmTestHelper
 import org.junit.Rule
 import org.junit.Test
 import ru.mobileup.rxplce.util.SchedulersRule
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-class LcePmImplTest {
+class LceImplTest {
 
     private val loadingDataSource = Single.just("foo")
     private val error = IOException()
@@ -22,14 +20,11 @@ class LcePmImplTest {
 
     @Test fun initialState() {
 
-        val lcePm = LcePmImpl(loadingData = loadingDataSource)
-        val pmTestHelper = PmTestHelper(lcePm)
-        pmTestHelper.setLifecycleTo(CREATED)
-
-        val testObserver = lcePm.dataState.observable.test()
+        val lce = LceImpl(loadingData = loadingDataSource)
+        val testObserver = lce.state.test()
 
         testObserver.assertValues(
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = null,
                 refreshing = false
@@ -39,30 +34,26 @@ class LcePmImplTest {
 
     @Test fun loadingSuccess() {
 
-        val lcePm = LcePmImpl(loadingData = loadingDataSource)
-        val pmTestHelper = PmTestHelper(lcePm)
+        val lce = LceImpl(loadingData = loadingDataSource)
+        val testObserver = lce.state.test()
 
-        pmTestHelper.setLifecycleTo(CREATED)
-
-        val testObserver = lcePm.dataState.observable.test()
-
-        lcePm.refreshes.consumer.accept(Unit)
+        lce.actions.accept(Lce.Action.REFRESH)
 
         testObserver.assertValues(
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = null,
                 refreshing = false
             ),
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = null,
                 refreshing = true
             ),
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = "foo",
                 refreshingError = null,
                 refreshing = false
@@ -73,30 +64,26 @@ class LcePmImplTest {
     @Test fun loadingFail() {
 
 
-        val lcePm = LcePmImpl(loadingData = loadingErrorSource)
-        val pmTestHelper = PmTestHelper(lcePm)
+        val lce = LceImpl(loadingData = loadingErrorSource)
+        val testObserver = lce.state.test()
 
-        pmTestHelper.setLifecycleTo(CREATED)
-
-        val testObserver = lcePm.dataState.observable.test()
-
-        lcePm.refreshes.consumer.accept(Unit)
+        lce.actions.accept(Lce.Action.REFRESH)
 
         testObserver.assertValues(
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = null,
                 refreshing = false
             ),
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = null,
                 refreshing = true
             ),
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = error,
                 refreshing = false
@@ -107,7 +94,7 @@ class LcePmImplTest {
     @Test fun refreshingSuccess() {
 
         val relay = BehaviorRelay.create<String>()
-        val lcePm = LcePmImpl(
+        val lce = LceImpl(
             refreshData = Completable.create {
                 relay.accept("foo")
                 it.onComplete()
@@ -115,35 +102,31 @@ class LcePmImplTest {
             dataChanges = relay
         )
 
-        val pmTestHelper = PmTestHelper(lcePm)
+        val testObserver = lce.state.test()
 
-        pmTestHelper.setLifecycleTo(CREATED)
-
-        val testObserver = lcePm.dataState.observable.test()
-
-        lcePm.refreshes.consumer.accept(Unit)
+        lce.actions.accept(Lce.Action.REFRESH)
 
         testObserver.assertValues(
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = null,
                 refreshing = false
             ),
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = null,
                 refreshing = true
             ),
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = "foo",
                 refreshingError = null,
                 refreshing = true
             ),
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = "foo",
                 refreshingError = null,
                 refreshing = false
@@ -154,36 +137,32 @@ class LcePmImplTest {
     @Test fun refreshingFail() {
 
         val relay = BehaviorRelay.create<String>()
-        val lcePm = LcePmImpl(
+        val lce = LceImpl(
             refreshData = Completable.create {
                 it.onError(error)
             },
             dataChanges = relay
         )
 
-        val pmTestHelper = PmTestHelper(lcePm)
+        val testObserver = lce.state.test()
 
-        pmTestHelper.setLifecycleTo(CREATED)
-
-        val testObserver = lcePm.dataState.observable.test()
-
-        lcePm.refreshes.consumer.accept(Unit)
+        lce.actions.accept(Lce.Action.REFRESH)
 
         testObserver.assertValues(
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = null,
                 refreshing = false
             ),
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = null,
                 refreshing = true
             ),
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = error,
                 refreshing = false
@@ -194,31 +173,27 @@ class LcePmImplTest {
     @Test fun externalUpdateData() {
 
         val relay = BehaviorRelay.create<String>()
-        val lcePm = LcePmImpl(
+        val lce = LceImpl(
             refreshData = Completable.create {
-                relay.accept("")
+                relay.accept("foo")
                 it.onComplete()
             },
             dataChanges = relay
         )
 
-        val pmTestHelper = PmTestHelper(lcePm)
-
-        pmTestHelper.setLifecycleTo(CREATED)
-
-        val testObserver = lcePm.dataState.observable.test()
+        val testObserver = lce.state.test()
 
         relay.accept("bar")
 
         testObserver.assertValues(
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = null,
                 refreshing = false
             ),
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = "bar",
                 refreshingError = null,
                 refreshing = false
@@ -229,7 +204,7 @@ class LcePmImplTest {
     @Test fun blockRepeatedRefreshing() {
 
         val relay = BehaviorRelay.create<String>()
-        val lcePm = LcePmImpl(
+        val lce = LceImpl(
             refreshData = Single.just("foo")
                 .delay(1, TimeUnit.SECONDS)
                 .doOnSuccess {
@@ -239,39 +214,35 @@ class LcePmImplTest {
             dataChanges = relay
         )
 
-        val pmTestHelper = PmTestHelper(lcePm)
+        val testObserver = lce.state.test()
 
-        pmTestHelper.setLifecycleTo(CREATED)
-
-        val testObserver = lcePm.dataState.observable.test()
-
-        lcePm.refreshes.consumer.accept(Unit)
-        lcePm.refreshes.consumer.accept(Unit)
-        lcePm.refreshes.consumer.accept(Unit)
+        lce.actions.accept(Lce.Action.REFRESH)
+        lce.actions.accept(Lce.Action.REFRESH)
+        lce.actions.accept(Lce.Action.REFRESH)
 
         schedulers.testScheduler.advanceTimeTo(3, TimeUnit.SECONDS)
 
         testObserver.assertValues(
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = null,
                 refreshing = false
             ),
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = null,
                 refreshingError = null,
                 refreshing = true
             ),
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = "foo",
                 refreshingError = null,
                 refreshing = true
             ),
 
-            LcePm.DataState(
+            Lce.DataState(
                 data = "foo",
                 refreshingError = null,
                 refreshing = false

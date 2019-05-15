@@ -22,7 +22,7 @@ interface PagingPm<T> {
             return when (data) {
                 is Collection<*> -> data.isEmpty()
                 is Array<*> -> data.isEmpty()
-                is LcePm.DataMaybeEmpty -> data.isEmpty()
+                is Lce.DataMaybeEmpty -> data.isEmpty()
                 else -> false
             }
         }
