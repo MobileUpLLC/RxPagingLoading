@@ -116,6 +116,8 @@ class LceImpl<T> private constructor(
                 }
             }
             .distinctUntilChanged()
+            .doOnNext { stateSubject.onNext(it) }
+            .share()
     }
 
     private sealed class InternalAction {

@@ -63,10 +63,6 @@ class LceScreenPmImpl<T>(
     override fun onCreate() {
         super.onCreate()
 
-        if (lce is PresentationModel) {
-            lce.attachToParent(this)
-        }
-
         screenStateChanges
             .filter { it.data != null }
             .map { it.data!! }

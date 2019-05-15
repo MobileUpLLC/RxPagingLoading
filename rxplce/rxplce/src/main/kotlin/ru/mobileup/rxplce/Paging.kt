@@ -1,12 +1,14 @@
 package ru.mobileup.rxplce
 
-import me.dmdev.rxpm.PresentationModel
+import io.reactivex.Observable
+import io.reactivex.functions.Consumer
 
-interface PagingPm<T> {
+interface Paging<T> {
 
-    val pagingState: PresentationModel.State<PagingState<T>>
-    val refreshes: PresentationModel.Action<Unit>
-    val loadNextPage: PresentationModel.Action<Unit>
+    enum class Action { REFRESH, LOAD_NEXT_PAGE }
+
+    val state: Observable<PagingState<T>>
+    val actions: Consumer<Action>
 
     data class PagingState<T>(
         val data: List<T>? = null,

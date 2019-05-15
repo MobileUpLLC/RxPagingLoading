@@ -3,48 +3,47 @@ package ru.mobileup.rxplce
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
-import me.dmdev.rxpm.PresentationModel
-import ru.mobileup.rxplce.PagingPm.Page
-import ru.mobileup.rxplce.PagingPm.PagingState
+import io.reactivex.functions.Consumer
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
+import ru.mobileup.rxplce.Paging.Page
+import ru.mobileup.rxplce.Paging.PagingState
 
-class PagingPmImpl<T>(
+class PagingImpl<T>(
     private val pagingSource: ((offset: Int, lastPage: Page<T>?) -> Single<Page<T>>)
-) : PresentationModel(), PagingPm<T> {
+) : Paging<T> {
 
-    override val pagingState = State<PagingState<T>>(PagingState())
-    override val refreshes = Action<Unit>()
-    override val loadNextPage = Action<Unit>()
+    private val stateSubject = BehaviorSubject.createDefault<PagingState<T>>(PagingState()).toSerialized()
+    private val actionSubject = PublishSubject.create<Paging.Action>().toSerialized()
 
-    private enum class ActionType { REFRESH, LOAD_PAGE }
+    override val actions: Consumer<Paging.Action>
+        get() = Consumer { actionSubject.onNext(it) }
 
-    override fun onCreate() {
-        super.onCreate()
+    override val state: Observable<PagingState<T>>
 
-        Observable
-            .merge(
-                refreshes.observable.map { ActionType.REFRESH },
-                loadNextPage.observable.map { ActionType.LOAD_PAGE }
-            )
+    init {
+
+        state = actionSubject
             .withLatestFrom(
-                pagingState.observable,
-                BiFunction { action: ActionType, state: PagingState<T> ->
+                stateSubject,
+                BiFunction { action: Paging.Action, state: PagingState<T> ->
                     action to state
                 }
             )
             .filter { (action, state) ->
                 when (action) {
-                    ActionType.LOAD_PAGE -> {
+                    Paging.Action.LOAD_NEXT_PAGE -> {
                         state.refreshing.not()
                                 && state.pageIsLoading.not()
                                 && state.isReachedEnd.not()
                     }
-                    ActionType.REFRESH -> state.refreshing.not()
+                    Paging.Action.REFRESH -> state.refreshing.not()
                 }
             }
             .switchMap { (action, state) ->
 
                 when (action) {
-                    ActionType.REFRESH -> {
+                    Paging.Action.REFRESH -> {
                         pagingSource(0, null)
                             .toObservable()
                             .map<InternalAction> { InternalAction.RefreshSuccess(it) }
@@ -52,7 +51,7 @@ class PagingPmImpl<T>(
                             .onErrorReturn { InternalAction.RefreshFail(it) }
                     }
 
-                    ActionType.LOAD_PAGE -> {
+                    Paging.Action.LOAD_NEXT_PAGE -> {
                         pagingSource(state.data?.size ?: 0, state.lastPage)
                             .toObservable()
                             .map<InternalAction> {
@@ -113,23 +112,17 @@ class PagingPmImpl<T>(
                 }
             }
             .distinctUntilChanged()
-            .subscribe(pagingState.consumer)
-            .untilDestroy()
+            .doOnNext { stateSubject.onNext(it) }
+            .share()
+
     }
 
     private sealed class InternalAction {
-
         object StartRefresh : InternalAction()
         class RefreshSuccess<T>(val page: Page<T>) : InternalAction()
         class RefreshFail(val error: Throwable) : InternalAction()
-
         object StartPageLoading : InternalAction()
         class PageLoadingSuccess<T>(val page: Page<T>) : InternalAction()
         class PageLoadingFail(val error: Throwable) : InternalAction()
-
-        override fun toString(): String {
-            return javaClass.simpleName
-        }
-
     }
 }
