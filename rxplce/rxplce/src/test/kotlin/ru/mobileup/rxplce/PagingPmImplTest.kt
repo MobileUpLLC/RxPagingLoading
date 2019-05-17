@@ -18,20 +18,20 @@ class PagingPmImplTest {
     private val pageLoadingError = IOException()
 
     data class DataPage(
-        override val list: List<Int>,
-        override val isReachedEnd: Boolean
+        override val items: List<Int>,
+        override val isEndReached: Boolean
     ) : Page<Int>
 
     private fun getPage(offset: Int, isReachedEnd: Boolean): Page<Int> {
         return DataPage(
-            list = List(3) { index -> index + offset + 1 },
-            isReachedEnd = isReachedEnd
+            items = List(3) { index -> index + offset + 1 },
+            isEndReached = isReachedEnd
         )
     }
 
     @Test fun initialState() {
 
-        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pageSource = { offset, _ ->
             Single.just(getPage(offset, false))
         })
 
@@ -40,8 +40,8 @@ class PagingPmImplTest {
         testObserver.assertValues(
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -51,7 +51,7 @@ class PagingPmImplTest {
 
     @Test fun firstLoadPage() {
 
-        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pageSource = { offset, _ ->
             Single.just(getPage(offset, false))
         })
 
@@ -62,8 +62,8 @@ class PagingPmImplTest {
         testObserver.assertValues(
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -71,8 +71,8 @@ class PagingPmImplTest {
 
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -80,8 +80,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -91,7 +91,7 @@ class PagingPmImplTest {
 
     @Test fun errorOnFirstLoadPage() {
 
-        val paging = PagingImpl<Int>(pagingSource = { _, _ ->
+        val paging = PagingImpl<Int>(pageSource = { _, _ ->
             Single.error(refreshingError)
         })
 
@@ -102,8 +102,8 @@ class PagingPmImplTest {
         testObserver.assertValues(
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -111,8 +111,8 @@ class PagingPmImplTest {
 
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -120,8 +120,8 @@ class PagingPmImplTest {
 
             State(
                 content = null,
-                loadingError = refreshingError,
-                pageLoadingError = null,
+                error = refreshingError,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -131,7 +131,7 @@ class PagingPmImplTest {
 
     @Test fun pagingSuccess() {
 
-        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pageSource = { offset, _ ->
             Single.just(getPage(offset, false))
         })
 
@@ -143,8 +143,8 @@ class PagingPmImplTest {
         testObserver.assertValues(
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -152,8 +152,8 @@ class PagingPmImplTest {
 
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -161,8 +161,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -170,8 +170,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -179,8 +179,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3, 4, 5, 6),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(4, 5, 6), false)
@@ -190,7 +190,7 @@ class PagingPmImplTest {
 
     @Test fun pagingFail() {
 
-        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pageSource = { offset, _ ->
             if (offset == 0) {
                 Single.just(getPage(offset, false))
             } else {
@@ -206,8 +206,8 @@ class PagingPmImplTest {
         testObserver.assertValues(
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -215,8 +215,8 @@ class PagingPmImplTest {
 
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -224,8 +224,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -233,8 +233,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -242,8 +242,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = pageLoadingError,
+                error = null,
+                pageError = pageLoadingError,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -253,7 +253,7 @@ class PagingPmImplTest {
 
     @Test fun isReachedEnd() {
 
-        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pageSource = { offset, _ ->
             Single.just(getPage(offset, offset > 0))
         })
 
@@ -268,8 +268,8 @@ class PagingPmImplTest {
         testObserver.assertValues(
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -277,8 +277,8 @@ class PagingPmImplTest {
 
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -286,8 +286,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -295,8 +295,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -304,8 +304,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3, 4, 5, 6),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(4, 5, 6), true)
@@ -315,7 +315,7 @@ class PagingPmImplTest {
 
     @Test fun blockRepeatedRefreshes() {
 
-        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pageSource = { offset, _ ->
             Single
                 .just(getPage(offset, false))
                 .delay(1, TimeUnit.SECONDS)
@@ -332,8 +332,8 @@ class PagingPmImplTest {
         testObserver.assertValues(
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -341,8 +341,8 @@ class PagingPmImplTest {
 
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -350,8 +350,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -361,7 +361,7 @@ class PagingPmImplTest {
 
     @Test fun blockRepeatedPaging() {
 
-        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pageSource = { offset, _ ->
             Single
                 .just(getPage(offset, false))
                 .delay(1, TimeUnit.SECONDS)
@@ -383,8 +383,8 @@ class PagingPmImplTest {
         testObserver.assertValues(
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -392,8 +392,8 @@ class PagingPmImplTest {
 
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -401,8 +401,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -410,8 +410,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -419,8 +419,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3, 4, 5, 6),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(4, 5, 6), false)
@@ -430,7 +430,7 @@ class PagingPmImplTest {
 
     @Test fun blockPagingOnRefreshing() {
 
-        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pageSource = { offset, _ ->
             Single
                 .just(getPage(offset, false))
                 .delay(1, TimeUnit.SECONDS)
@@ -446,8 +446,8 @@ class PagingPmImplTest {
         testObserver.assertValues(
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -455,8 +455,8 @@ class PagingPmImplTest {
 
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -464,8 +464,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -475,7 +475,7 @@ class PagingPmImplTest {
 
     @Test fun interruptPagingByRefresh() {
 
-        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pageSource = { offset, _ ->
             Single
                 .just(getPage(offset, false))
                 .delay(1, TimeUnit.SECONDS)
@@ -495,8 +495,8 @@ class PagingPmImplTest {
         testObserver.assertValues(
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -504,8 +504,8 @@ class PagingPmImplTest {
 
             State(
                 content = null,
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -513,8 +513,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -522,8 +522,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -531,8 +531,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -540,8 +540,8 @@ class PagingPmImplTest {
 
             State(
                 content = listOf(1, 2, 3),
-                loadingError = null,
-                pageLoadingError = null,
+                error = null,
+                pageError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)

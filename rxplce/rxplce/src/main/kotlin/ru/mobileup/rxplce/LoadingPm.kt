@@ -2,7 +2,7 @@ package ru.mobileup.rxplce
 
 import me.dmdev.rxpm.PresentationModel
 
-interface LcePm<T> {
+interface LoadingPm<T> {
 
     val content: PresentationModel.State<T>
 
@@ -11,10 +11,10 @@ interface LcePm<T> {
 
     val refreshEnabled: PresentationModel.State<Boolean>
 
-    val contentVisible: PresentationModel.State<Boolean>
+    val contentViewVisible: PresentationModel.State<Boolean>
     val emptyViewVisible: PresentationModel.State<Boolean>
     val errorViewVisible: PresentationModel.State<Boolean>
 
     val refreshAction: PresentationModel.Action<Unit>
-    val retryLoadAction: PresentationModel.Action<Unit>
+    val retryAction: PresentationModel.Action<Unit>
 }

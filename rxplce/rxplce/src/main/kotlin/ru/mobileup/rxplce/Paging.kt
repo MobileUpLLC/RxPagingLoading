@@ -13,17 +13,17 @@ interface Paging<T> {
     data class State<T>(
         val content: List<T>? = null,
         val loading: Boolean = false,
-        val loadingError: Throwable? = null,
+        val error: Throwable? = null,
         val pageLoading: Boolean = false,
-        val pageLoadingError: Throwable? = null,
+        val pageError: Throwable? = null,
         val lastPage: Page<T>? = null
     ) {
-        val isReachedEnd: Boolean get() = lastPage?.isReachedEnd ?: false
+        val isEndReached: Boolean get() = lastPage?.isEndReached ?: false
     }
 
     interface Page<T> {
-        val list: List<T>
-        val lastItem: T? get() = list.lastOrNull()
-        val isReachedEnd: Boolean
+        val items: List<T>
+        val lastItem: T? get() = items.lastOrNull()
+        val isEndReached: Boolean
     }
 }

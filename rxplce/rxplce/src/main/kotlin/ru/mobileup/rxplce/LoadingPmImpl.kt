@@ -3,10 +3,10 @@ package ru.mobileup.rxplce
 import io.reactivex.Observable
 import me.dmdev.rxpm.PresentationModel
 
-class LcePmImpl<T>(
-    private val lce: Lce<T>,
-    private val stateMapper: ScreenStateMapper<T> = DefaultScreenStateMapper()
-) : PresentationModel(), LcePm<T> {
+class LoadingPmImpl<T>(
+    private val loading: Loading<T>,
+    private val stateMapper: ScreenStateMapper<T> = ScreenStateMapperDefault()
+) : PresentationModel(), LoadingPm<T> {
 
     override val content = State<T>()
 
@@ -15,18 +15,21 @@ class LcePmImpl<T>(
 
     override val refreshEnabled = State<Boolean>()
 
-    override val contentVisible = State<Boolean>()
+    override val contentViewVisible = State<Boolean>()
     override val emptyViewVisible = State<Boolean>()
     override val errorViewVisible = State<Boolean>()
 
     override val refreshAction = Action<Unit>()
-    override val retryLoadAction = Action<Unit>()
+    override val retryAction = Action<Unit>()
 
-    val showError = Command<Throwable>()
+    val errorNoticeObservable: Observable<Throwable> = loading.state
+        .filter { it.content != null && it.error != null }
+        .map { it.error!! }
+        .distinctUntilChanged()
 
-    private val screenStateChanges = lce.state
+    private val screenStateChanges = loading.state
         .map {
-            stateMapper.mapLceStateToScreenState(it.loading, it.content, it.loadingError)
+            stateMapper.mapToScreenState(it.loading, it.content, it.error)
         }
         .share()
 
@@ -34,8 +37,8 @@ class LcePmImpl<T>(
         super.onCreate()
 
         screenStateChanges
-            .filter { it.data != null }
-            .map { it.data!! }
+            .filter { it.content != null }
+            .map { it.content!! }
             .subscribe(content.consumer)
             .untilDestroy()
 
@@ -58,34 +61,27 @@ class LcePmImpl<T>(
             .untilDestroy()
 
         screenStateChanges
-            .map { it.contentIsVisible }
+            .map { it.contentViewVisible }
             .distinctUntilChanged()
-            .subscribe(contentVisible.consumer)
+            .subscribe(contentViewVisible.consumer)
             .untilDestroy()
 
         screenStateChanges
-            .map { it.emptyViewIsVisible }
+            .map { it.emptyViewVisible }
             .distinctUntilChanged()
             .subscribe(emptyViewVisible.consumer)
             .untilDestroy()
 
         screenStateChanges
-            .map { it.errorViewIsVisible }
+            .map { it.errorViewVisible }
             .distinctUntilChanged()
             .subscribe(errorViewVisible.consumer)
             .untilDestroy()
 
-        lce.state
-            .filter { it.content != null && it.loadingError != null }
-            .map { it.loadingError!! }
-            .distinctUntilChanged()
-            .subscribe(showError.consumer)
-            .untilDestroy()
-
-        Observable.merge(refreshAction.observable, retryLoadAction.observable)
+        Observable.merge(refreshAction.observable, retryAction.observable)
             .startWith(Unit)
-            .map { Lce.Action.REFRESH }
-            .subscribe(lce.actions)
+            .map { Loading.Action.REFRESH }
+            .subscribe(loading.actions)
             .untilDestroy()
     }
 }

@@ -27,10 +27,10 @@ class LoadingSampleActivity : PmSupportActivity<LoadingSamplePm>() {
 
         pm.isLoading bindTo progressBar.visibility()
 
-        pm.contentVisible bindTo contentView.visibility()
+        pm.contentViewVisible bindTo contentView.visibility()
         pm.emptyViewVisible bindTo emptyView.visibility()
         pm.errorViewVisible bindTo errorView.visibility()
 
-        retryButton.clicks() bindTo pm.retryLoadAction
+        retryButton.clicks() bindTo pm.retryAction
     }
 }

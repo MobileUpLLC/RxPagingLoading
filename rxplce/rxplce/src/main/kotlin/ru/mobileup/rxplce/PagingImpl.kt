@@ -10,16 +10,14 @@ import ru.mobileup.rxplce.Paging.Page
 import ru.mobileup.rxplce.Paging.State
 
 class PagingImpl<T>(
-    private val pagingSource: ((offset: Int, lastPage: Page<T>?) -> Single<Page<T>>)
+    private val pageSource: ((offset: Int, lastPage: Page<T>?) -> Single<Page<T>>)
 ) : Paging<T> {
 
     private val stateSubject = BehaviorSubject.createDefault<State<T>>(State()).toSerialized()
     private val actionSubject = PublishSubject.create<Paging.Action>().toSerialized()
 
-    override val actions: Consumer<Paging.Action>
-        get() = Consumer { actionSubject.onNext(it) }
-
     override val state: Observable<State<T>>
+    override val actions: Consumer<Paging.Action> = Consumer { actionSubject.onNext(it) }
 
     init {
 
@@ -35,7 +33,7 @@ class PagingImpl<T>(
                     Paging.Action.LOAD_NEXT_PAGE -> {
                         state.loading.not()
                                 && state.pageLoading.not()
-                                && state.isReachedEnd.not()
+                                && state.isEndReached.not()
                     }
                     Paging.Action.REFRESH -> state.loading.not()
                 }
@@ -44,37 +42,37 @@ class PagingImpl<T>(
 
                 when (action) {
                     Paging.Action.REFRESH -> {
-                        pagingSource(0, null)
+                        pageSource(0, null)
                             .toObservable()
                             .map<InternalAction> { InternalAction.RefreshSuccess(it) }
-                            .startWith(InternalAction.StartRefresh)
+                            .startWith(InternalAction.RefreshStart)
                             .onErrorReturn { InternalAction.RefreshFail(it) }
                     }
 
                     Paging.Action.LOAD_NEXT_PAGE -> {
-                        pagingSource(state.content?.size ?: 0, state.lastPage)
+                        pageSource(state.content?.size ?: 0, state.lastPage)
                             .toObservable()
                             .map<InternalAction> {
                                 InternalAction.PageLoadingSuccess(it)
                             }
-                            .startWith(InternalAction.StartPageLoading)
+                            .startWith(InternalAction.PageLoadingStart)
                             .onErrorReturn { InternalAction.PageLoadingFail(it) }
                     }
                 }
             }
             .scan(State<T>()) { state, action ->
                 when (action) {
-                    InternalAction.StartRefresh -> {
+                    InternalAction.RefreshStart -> {
                         state.copy(
                             loading = true,
                             pageLoading = false,
-                            loadingError = null
+                            error = null
                         )
                     }
                     is InternalAction.RefreshFail -> {
                         state.copy(
                             loading = false,
-                            loadingError = action.error
+                            error = action.error
                         )
                     }
                     is InternalAction.RefreshSuccess<*> -> {
@@ -83,20 +81,20 @@ class PagingImpl<T>(
                         val page = action.page as Page<T>
 
                         State(
-                            content = page.list,
+                            content = page.items,
                             lastPage = page
                         )
                     }
-                    InternalAction.StartPageLoading -> {
+                    InternalAction.PageLoadingStart -> {
                         state.copy(
                             pageLoading = true,
-                            pageLoadingError = null
+                            pageError = null
                         )
                     }
                     is InternalAction.PageLoadingFail -> {
                         state.copy(
                             pageLoading = false,
-                            pageLoadingError = action.error
+                            pageError = action.error
                         )
                     }
                     is InternalAction.PageLoadingSuccess<*> -> {
@@ -105,7 +103,7 @@ class PagingImpl<T>(
 
                         state.copy(
                             pageLoading = false,
-                            content = state.content?.plus(page.list),
+                            content = state.content?.plus(page.items),
                             lastPage = page
                         )
                     }
@@ -118,10 +116,10 @@ class PagingImpl<T>(
     }
 
     private sealed class InternalAction {
-        object StartRefresh : InternalAction()
+        object RefreshStart : InternalAction()
         class RefreshSuccess<T>(val page: Page<T>) : InternalAction()
         class RefreshFail(val error: Throwable) : InternalAction()
-        object StartPageLoading : InternalAction()
+        object PageLoadingStart : InternalAction()
         class PageLoadingSuccess<T>(val page: Page<T>) : InternalAction()
         class PageLoadingFail(val error: Throwable) : InternalAction()
     }

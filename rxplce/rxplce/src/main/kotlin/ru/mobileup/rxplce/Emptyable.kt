@@ -1,5 +1,5 @@
 package ru.mobileup.rxplce
 
-interface MaybeEmpty {
+interface Emptyable {
     fun isEmpty(): Boolean
 }
