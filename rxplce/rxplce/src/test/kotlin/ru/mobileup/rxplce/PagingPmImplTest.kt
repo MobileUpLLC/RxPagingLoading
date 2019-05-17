@@ -1,12 +1,10 @@
 package ru.mobileup.rxplce
 
 import io.reactivex.Single
-import me.dmdev.rxpm.PresentationModel
-import me.dmdev.rxpm.test.PmTestHelper
 import org.junit.Rule
 import org.junit.Test
-import ru.mobileup.rxplce.PagingPm.Page
-import ru.mobileup.rxplce.PagingPm.PagingState
+import ru.mobileup.rxplce.Paging.Page
+import ru.mobileup.rxplce.Paging.PagingState
 import ru.mobileup.rxplce.util.SchedulersRule
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -33,15 +31,11 @@ class PagingPmImplTest {
 
     @Test fun initialState() {
 
-        val pagingPm = PagingPmImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
             Single.just(getPage(offset, false))
         })
 
-        val pmTestHelper = PmTestHelper(pagingPm)
-
-        pmTestHelper.setLifecycleTo(PresentationModel.Lifecycle.CREATED)
-
-        val testObserver = pagingPm.pagingState.observable.test()
+        val testObserver = paging.state.test()
 
         testObserver.assertValues(
             PagingState(
@@ -57,17 +51,13 @@ class PagingPmImplTest {
 
     @Test fun firstLoadPage() {
 
-        val pagingPm = PagingPmImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
             Single.just(getPage(offset, false))
         })
 
-        val pmTestHelper = PmTestHelper(pagingPm)
+        val testObserver = paging.state.test()
 
-        pmTestHelper.setLifecycleTo(PresentationModel.Lifecycle.CREATED)
-
-        val testObserver = pagingPm.pagingState.observable.test()
-
-        pagingPm.refreshes.consumer.accept(Unit)
+        paging.actions.accept(Paging.Action.REFRESH)
 
         testObserver.assertValues(
             PagingState(
@@ -101,17 +91,13 @@ class PagingPmImplTest {
 
     @Test fun errorOnFirstLoadPage() {
 
-        val pagingPm = PagingPmImpl<Int>(pagingSource = { _, _ ->
+        val paging = PagingImpl<Int>(pagingSource = { _, _ ->
             Single.error(refreshingError)
         })
 
-        val pmTestHelper = PmTestHelper(pagingPm)
+        val testObserver = paging.state.test()
 
-        pmTestHelper.setLifecycleTo(PresentationModel.Lifecycle.CREATED)
-
-        val testObserver = pagingPm.pagingState.observable.test()
-
-        pagingPm.refreshes.consumer.accept(Unit)
+        paging.actions.accept(Paging.Action.REFRESH)
 
         testObserver.assertValues(
             PagingState(
@@ -145,18 +131,14 @@ class PagingPmImplTest {
 
     @Test fun pagingSuccess() {
 
-        val pagingPm = PagingPmImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
             Single.just(getPage(offset, false))
         })
 
-        val pmTestHelper = PmTestHelper(pagingPm)
+        val testObserver = paging.state.test()
 
-        pmTestHelper.setLifecycleTo(PresentationModel.Lifecycle.CREATED)
-
-        val testObserver = pagingPm.pagingState.observable.test()
-
-        pagingPm.refreshes.consumer.accept(Unit)
-        pagingPm.loadNextPage.consumer.accept(Unit)
+        paging.actions.accept(Paging.Action.REFRESH)
+        paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
 
         testObserver.assertValues(
             PagingState(
@@ -208,7 +190,7 @@ class PagingPmImplTest {
 
     @Test fun pagingFail() {
 
-        val pagingPm = PagingPmImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
             if (offset == 0) {
                 Single.just(getPage(offset, false))
             } else {
@@ -216,14 +198,10 @@ class PagingPmImplTest {
             }
         })
 
-        val pmTestHelper = PmTestHelper(pagingPm)
+        val testObserver = paging.state.test()
 
-        pmTestHelper.setLifecycleTo(PresentationModel.Lifecycle.CREATED)
-
-        val testObserver = pagingPm.pagingState.observable.test()
-
-        pagingPm.refreshes.consumer.accept(Unit)
-        pagingPm.loadNextPage.consumer.accept(Unit)
+        paging.actions.accept(Paging.Action.REFRESH)
+        paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
 
         testObserver.assertValues(
             PagingState(
@@ -274,22 +252,18 @@ class PagingPmImplTest {
     }
 
     @Test fun isReachedEnd() {
-        val pagingPm = PagingPmImpl<Int>(pagingSource = { offset, _ ->
+
+        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
             Single.just(getPage(offset, offset > 0))
         })
 
-        val pmTestHelper = PmTestHelper(pagingPm)
+        val testObserver = paging.state.test()
 
-        pmTestHelper.setLifecycleTo(PresentationModel.Lifecycle.CREATED)
-
-        val testObserver = pagingPm.pagingState.observable.test()
-
-        pagingPm.refreshes.consumer.accept(Unit)
-        pagingPm.loadNextPage.consumer.accept(Unit)
-        pagingPm.loadNextPage.consumer.accept(Unit)
-        pagingPm.loadNextPage.consumer.accept(Unit)
-        pagingPm.loadNextPage.consumer.accept(Unit)
-        pagingPm.loadNextPage.consumer.accept(Unit)
+        paging.actions.accept(Paging.Action.REFRESH)
+        paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
+        paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
+        paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
+        paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
 
         testObserver.assertValues(
             PagingState(
@@ -341,21 +315,17 @@ class PagingPmImplTest {
 
     @Test fun blockRepeatedRefreshes() {
 
-        val pagingPm = PagingPmImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
             Single
                 .just(getPage(offset, false))
                 .delay(1, TimeUnit.SECONDS)
         })
 
-        val pmTestHelper = PmTestHelper(pagingPm)
+        val testObserver = paging.state.test()
 
-        pmTestHelper.setLifecycleTo(PresentationModel.Lifecycle.CREATED)
-
-        val testObserver = pagingPm.pagingState.observable.test()
-
-        pagingPm.refreshes.consumer.accept(Unit)
-        pagingPm.refreshes.consumer.accept(Unit)
-        pagingPm.refreshes.consumer.accept(Unit)
+        paging.actions.accept(Paging.Action.REFRESH)
+        paging.actions.accept(Paging.Action.REFRESH)
+        paging.actions.accept(Paging.Action.REFRESH)
 
         schedulers.testScheduler.advanceTimeTo(2, TimeUnit.SECONDS)
 
@@ -391,26 +361,22 @@ class PagingPmImplTest {
 
     @Test fun blockRepeatedPaging() {
 
-        val pagingPm = PagingPmImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
             Single
                 .just(getPage(offset, false))
                 .delay(1, TimeUnit.SECONDS)
         })
 
-        val pmTestHelper = PmTestHelper(pagingPm)
+        val testObserver = paging.state.test()
 
-        pmTestHelper.setLifecycleTo(PresentationModel.Lifecycle.CREATED)
-
-        val testObserver = pagingPm.pagingState.observable.test()
-
-        pagingPm.refreshes.consumer.accept(Unit)
+        paging.actions.accept(Paging.Action.REFRESH)
 
         schedulers.testScheduler.advanceTimeTo(2, TimeUnit.SECONDS)
 
-        pagingPm.loadNextPage.consumer.accept(Unit)
-        pagingPm.loadNextPage.consumer.accept(Unit)
-        pagingPm.loadNextPage.consumer.accept(Unit)
-        pagingPm.loadNextPage.consumer.accept(Unit)
+        paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
+        paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
+        paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
+        paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
 
         schedulers.testScheduler.advanceTimeTo(4, TimeUnit.SECONDS)
 
@@ -464,20 +430,16 @@ class PagingPmImplTest {
 
     @Test fun blockPagingOnRefreshing() {
 
-        val pagingPm = PagingPmImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
             Single
                 .just(getPage(offset, false))
                 .delay(1, TimeUnit.SECONDS)
         })
 
-        val pmTestHelper = PmTestHelper(pagingPm)
+        val testObserver = paging.state.test()
 
-        pmTestHelper.setLifecycleTo(PresentationModel.Lifecycle.CREATED)
-
-        val testObserver = pagingPm.pagingState.observable.test()
-
-        pagingPm.refreshes.consumer.accept(Unit)
-        pagingPm.loadNextPage.consumer.accept(Unit)
+        paging.actions.accept(Paging.Action.REFRESH)
+        paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
 
         schedulers.testScheduler.advanceTimeTo(2, TimeUnit.SECONDS)
 
@@ -513,24 +475,20 @@ class PagingPmImplTest {
 
     @Test fun interruptPagingByRefresh() {
 
-        val pagingPm = PagingPmImpl<Int>(pagingSource = { offset, _ ->
+        val paging = PagingImpl<Int>(pagingSource = { offset, _ ->
             Single
                 .just(getPage(offset, false))
                 .delay(1, TimeUnit.SECONDS)
         })
 
-        val pmTestHelper = PmTestHelper(pagingPm)
+        val testObserver = paging.state.test()
 
-        pmTestHelper.setLifecycleTo(PresentationModel.Lifecycle.CREATED)
-
-        val testObserver = pagingPm.pagingState.observable.test()
-
-        pagingPm.refreshes.consumer.accept(Unit)
+        paging.actions.accept(Paging.Action.REFRESH)
 
         schedulers.testScheduler.advanceTimeTo(2, TimeUnit.SECONDS)
 
-        pagingPm.loadNextPage.consumer.accept(Unit)
-        pagingPm.refreshes.consumer.accept(Unit)
+        paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
+        paging.actions.accept(Paging.Action.REFRESH)
 
         schedulers.testScheduler.advanceTimeTo(4, TimeUnit.SECONDS)
 

@@ -4,15 +4,17 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
-import me.dmdev.rxpm.PresentationModel
-import ru.mobileup.rxplce.LcePm.DataState
+import io.reactivex.functions.Consumer
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
+import ru.mobileup.rxplce.Lce.Action
+import ru.mobileup.rxplce.Lce.DataState
 
-
-class LcePmImpl<T> private constructor(
+class LceImpl<T> private constructor(
     private val refreshData: Completable?,
     private val loadData: Single<T>?,
     private val dataChanges: Observable<T>?
-) : PresentationModel(), LcePm<T> {
+) : Lce<T> {
 
     constructor(loadingData: Single<T>) : this(
         refreshData = null,
@@ -29,11 +31,15 @@ class LcePmImpl<T> private constructor(
         dataChanges = dataChanges
     )
 
-    override val dataState = State<DataState<T>>(DataState())
-    override val refreshes = Action<Unit>()
+    private val stateSubject = BehaviorSubject.createDefault<DataState<T>>(DataState()).toSerialized()
+    private val actionSubject = PublishSubject.create<Action>().toSerialized()
 
-    override fun onCreate() {
-        super.onCreate()
+    override val actions: Consumer<Action>
+        get() = Consumer { actionSubject.onNext(it) }
+
+    override val state: Observable<DataState<T>>
+
+    init {
 
         val observable =
             when {
@@ -51,10 +57,10 @@ class LcePmImpl<T> private constructor(
                 else -> Observable.empty()
             }
 
-        refreshes.observable
+        state = actionSubject
             .withLatestFrom(
-                dataState.observable,
-                BiFunction { _: Unit, state: DataState<T> -> state }
+                stateSubject,
+                BiFunction { _: Action, state: DataState<T> -> state }
             )
             .filter { !it.refreshing }
             .switchMap { observable }
@@ -110,9 +116,8 @@ class LcePmImpl<T> private constructor(
                 }
             }
             .distinctUntilChanged()
-            .subscribe(dataState.consumer)
-            .untilDestroy()
-
+            .doOnNext { stateSubject.onNext(it) }
+            .share()
     }
 
     private sealed class InternalAction {

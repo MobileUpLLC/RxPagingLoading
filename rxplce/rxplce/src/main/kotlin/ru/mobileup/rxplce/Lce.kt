@@ -1,11 +1,14 @@
 package ru.mobileup.rxplce
 
-import me.dmdev.rxpm.PresentationModel
+import io.reactivex.Observable
+import io.reactivex.functions.Consumer
 
-interface LcePm<T> {
+interface Lce<T> {
 
-    val dataState: PresentationModel.State<DataState<T>>
-    val refreshes: PresentationModel.Action<Unit>
+    enum class Action { REFRESH }
+
+    val state: Observable<DataState<T>>
+    val actions: Consumer<Action>
 
     interface DataMaybeEmpty {
         fun isEmpty(): Boolean
