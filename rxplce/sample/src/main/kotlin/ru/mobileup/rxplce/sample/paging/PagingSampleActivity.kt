@@ -56,7 +56,7 @@ class PagingSampleActivity : PmSupportActivity<PagingSamplePm>() {
 
     override fun onBindPresentationModel(pm: PagingSamplePm) {
 
-        pm.data bindTo { itemsAdapter.submitList(it) }
+        pm.content bindTo { itemsAdapter.submitList(it) }
 
         pm.scrollToTop bindTo { recyclerView?.smoothScrollToPosition(0) }
 

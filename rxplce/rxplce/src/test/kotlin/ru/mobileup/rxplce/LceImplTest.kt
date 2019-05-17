@@ -24,10 +24,10 @@ class LceImplTest {
         val testObserver = lce.state.test()
 
         testObserver.assertValues(
-            Lce.DataState(
-                data = null,
-                refreshingError = null,
-                refreshing = false
+            Lce.State(
+                content = null,
+                loadingError = null,
+                loading = false
             )
         )
     }
@@ -41,22 +41,22 @@ class LceImplTest {
 
         testObserver.assertValues(
 
-            Lce.DataState(
-                data = null,
-                refreshingError = null,
-                refreshing = false
+            Lce.State(
+                content = null,
+                loadingError = null,
+                loading = false
             ),
 
-            Lce.DataState(
-                data = null,
-                refreshingError = null,
-                refreshing = true
+            Lce.State(
+                content = null,
+                loadingError = null,
+                loading = true
             ),
 
-            Lce.DataState(
-                data = "foo",
-                refreshingError = null,
-                refreshing = false
+            Lce.State(
+                content = "foo",
+                loadingError = null,
+                loading = false
             )
         )
     }
@@ -71,22 +71,22 @@ class LceImplTest {
 
         testObserver.assertValues(
 
-            Lce.DataState(
-                data = null,
-                refreshingError = null,
-                refreshing = false
+            Lce.State(
+                content = null,
+                loadingError = null,
+                loading = false
             ),
 
-            Lce.DataState(
-                data = null,
-                refreshingError = null,
-                refreshing = true
+            Lce.State(
+                content = null,
+                loadingError = null,
+                loading = true
             ),
 
-            Lce.DataState(
-                data = null,
-                refreshingError = error,
-                refreshing = false
+            Lce.State(
+                content = null,
+                loadingError = error,
+                loading = false
             )
         )
     }
@@ -108,28 +108,28 @@ class LceImplTest {
 
         testObserver.assertValues(
 
-            Lce.DataState(
-                data = null,
-                refreshingError = null,
-                refreshing = false
+            Lce.State(
+                content = null,
+                loadingError = null,
+                loading = false
             ),
 
-            Lce.DataState(
-                data = null,
-                refreshingError = null,
-                refreshing = true
+            Lce.State(
+                content = null,
+                loadingError = null,
+                loading = true
             ),
 
-            Lce.DataState(
-                data = "foo",
-                refreshingError = null,
-                refreshing = true
+            Lce.State(
+                content = "foo",
+                loadingError = null,
+                loading = true
             ),
 
-            Lce.DataState(
-                data = "foo",
-                refreshingError = null,
-                refreshing = false
+            Lce.State(
+                content = "foo",
+                loadingError = null,
+                loading = false
             )
         )
     }
@@ -150,22 +150,22 @@ class LceImplTest {
 
         testObserver.assertValues(
 
-            Lce.DataState(
-                data = null,
-                refreshingError = null,
-                refreshing = false
+            Lce.State(
+                content = null,
+                loadingError = null,
+                loading = false
             ),
 
-            Lce.DataState(
-                data = null,
-                refreshingError = null,
-                refreshing = true
+            Lce.State(
+                content = null,
+                loadingError = null,
+                loading = true
             ),
 
-            Lce.DataState(
-                data = null,
-                refreshingError = error,
-                refreshing = false
+            Lce.State(
+                content = null,
+                loadingError = error,
+                loading = false
             )
         )
     }
@@ -187,16 +187,16 @@ class LceImplTest {
 
         testObserver.assertValues(
 
-            Lce.DataState(
-                data = null,
-                refreshingError = null,
-                refreshing = false
+            Lce.State(
+                content = null,
+                loadingError = null,
+                loading = false
             ),
 
-            Lce.DataState(
-                data = "bar",
-                refreshingError = null,
-                refreshing = false
+            Lce.State(
+                content = "bar",
+                loadingError = null,
+                loading = false
             )
         )
     }
@@ -224,28 +224,28 @@ class LceImplTest {
 
         testObserver.assertValues(
 
-            Lce.DataState(
-                data = null,
-                refreshingError = null,
-                refreshing = false
+            Lce.State(
+                content = null,
+                loadingError = null,
+                loading = false
             ),
 
-            Lce.DataState(
-                data = null,
-                refreshingError = null,
-                refreshing = true
+            Lce.State(
+                content = null,
+                loadingError = null,
+                loading = true
             ),
 
-            Lce.DataState(
-                data = "foo",
-                refreshingError = null,
-                refreshing = true
+            Lce.State(
+                content = "foo",
+                loadingError = null,
+                loading = true
             ),
 
-            Lce.DataState(
-                data = "foo",
-                refreshingError = null,
-                refreshing = false
+            Lce.State(
+                content = "foo",
+                loadingError = null,
+                loading = false
             )
         )
     }

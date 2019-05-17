@@ -2,9 +2,9 @@ package ru.mobileup.rxplce
 
 import me.dmdev.rxpm.PresentationModel
 
-interface LceScreenPm<T> {
+interface LcePm<T> {
 
-    val data: PresentationModel.State<T>
+    val content: PresentationModel.State<T>
 
     val isLoading: PresentationModel.State<Boolean>
     val isRefreshing: PresentationModel.State<Boolean>

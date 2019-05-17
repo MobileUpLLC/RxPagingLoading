@@ -7,26 +7,12 @@ interface Lce<T> {
 
     enum class Action { REFRESH }
 
-    val state: Observable<DataState<T>>
+    val state: Observable<State<T>>
     val actions: Consumer<Action>
 
-    interface DataMaybeEmpty {
-        fun isEmpty(): Boolean
-    }
-
-    data class DataState<T>(
-        val data: T? = null,
-        val refreshingError: Throwable? = null,
-        val refreshing: Boolean = false
-    ) {
-
-        fun dataIsEmpty(): Boolean {
-            return when (data) {
-                is Collection<*> -> data.isEmpty()
-                is Array<*> -> data.isEmpty()
-                is DataMaybeEmpty -> data.isEmpty()
-                else -> false
-            }
-        }
-    }
+    data class State<T>(
+        val content: T? = null,
+        val loading: Boolean = false,
+        val loadingError: Throwable? = null
+    )
 }

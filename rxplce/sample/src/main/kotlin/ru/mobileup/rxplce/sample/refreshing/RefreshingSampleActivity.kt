@@ -39,7 +39,7 @@ class RefreshingSampleActivity : PmSupportActivity<RefreshingSamplePm>() {
 
     override fun onBindPresentationModel(pm: RefreshingSamplePm) {
 
-        pm.data bindTo {
+        pm.content bindTo {
             val sb = StringBuilder("Random numbers:\n\n")
             contentView.text = it.joinTo(buffer = sb, separator = "\n").toString()
         }

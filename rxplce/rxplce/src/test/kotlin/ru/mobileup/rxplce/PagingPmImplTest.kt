@@ -4,7 +4,7 @@ import io.reactivex.Single
 import org.junit.Rule
 import org.junit.Test
 import ru.mobileup.rxplce.Paging.Page
-import ru.mobileup.rxplce.Paging.PagingState
+import ru.mobileup.rxplce.Paging.State
 import ru.mobileup.rxplce.util.SchedulersRule
 import java.io.IOException
 import java.util.concurrent.TimeUnit
@@ -38,12 +38,12 @@ class PagingPmImplTest {
         val testObserver = paging.state.test()
 
         testObserver.assertValues(
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = null
             )
         )
@@ -60,30 +60,30 @@ class PagingPmImplTest {
         paging.actions.accept(Paging.Action.REFRESH)
 
         testObserver.assertValues(
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = true,
-                pageIsLoading = false,
+                loading = true,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             )
         )
@@ -100,30 +100,30 @@ class PagingPmImplTest {
         paging.actions.accept(Paging.Action.REFRESH)
 
         testObserver.assertValues(
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = true,
-                pageIsLoading = false,
+                loading = true,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = null,
-                refreshingError = refreshingError,
+            State(
+                content = null,
+                loadingError = refreshingError,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = null
             )
         )
@@ -141,48 +141,48 @@ class PagingPmImplTest {
         paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
 
         testObserver.assertValues(
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = true,
-                pageIsLoading = false,
+                loading = true,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = true,
+                loading = false,
+                pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3, 4, 5, 6),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3, 4, 5, 6),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = DataPage(listOf(4, 5, 6), false)
             )
         )
@@ -204,48 +204,48 @@ class PagingPmImplTest {
         paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
 
         testObserver.assertValues(
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = true,
-                pageIsLoading = false,
+                loading = true,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = true,
+                loading = false,
+                pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = pageLoadingError,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             )
         )
@@ -266,48 +266,48 @@ class PagingPmImplTest {
         paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
 
         testObserver.assertValues(
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = true,
-                pageIsLoading = false,
+                loading = true,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = true,
+                loading = false,
+                pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3, 4, 5, 6),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3, 4, 5, 6),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = DataPage(listOf(4, 5, 6), true)
             )
         )
@@ -330,30 +330,30 @@ class PagingPmImplTest {
         schedulers.testScheduler.advanceTimeTo(2, TimeUnit.SECONDS)
 
         testObserver.assertValues(
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = true,
-                pageIsLoading = false,
+                loading = true,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             )
         )
@@ -381,48 +381,48 @@ class PagingPmImplTest {
         schedulers.testScheduler.advanceTimeTo(4, TimeUnit.SECONDS)
 
         testObserver.assertValues(
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = true,
-                pageIsLoading = false,
+                loading = true,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = true,
+                loading = false,
+                pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3, 4, 5, 6),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3, 4, 5, 6),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = DataPage(listOf(4, 5, 6), false)
             )
         )
@@ -444,30 +444,30 @@ class PagingPmImplTest {
         schedulers.testScheduler.advanceTimeTo(2, TimeUnit.SECONDS)
 
         testObserver.assertValues(
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = true,
-                pageIsLoading = false,
+                loading = true,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             )
         )
@@ -493,57 +493,57 @@ class PagingPmImplTest {
         schedulers.testScheduler.advanceTimeTo(4, TimeUnit.SECONDS)
 
         testObserver.assertValues(
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = null,
-                refreshingError = null,
+            State(
+                content = null,
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = true,
-                pageIsLoading = false,
+                loading = true,
+                pageLoading = false,
                 lastPage = null
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = true,
+                loading = false,
+                pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = true,
-                pageIsLoading = false,
+                loading = true,
+                pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             ),
 
-            PagingState(
-                data = listOf(1, 2, 3),
-                refreshingError = null,
+            State(
+                content = listOf(1, 2, 3),
+                loadingError = null,
                 pageLoadingError = null,
-                refreshing = false,
-                pageIsLoading = false,
+                loading = false,
+                pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
             )
         )

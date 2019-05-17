@@ -7,27 +7,18 @@ interface Paging<T> {
 
     enum class Action { REFRESH, LOAD_NEXT_PAGE }
 
-    val state: Observable<PagingState<T>>
+    val state: Observable<State<T>>
     val actions: Consumer<Action>
 
-    data class PagingState<T>(
-        val data: List<T>? = null,
-        val refreshingError: Throwable? = null,
+    data class State<T>(
+        val content: List<T>? = null,
+        val loading: Boolean = false,
+        val loadingError: Throwable? = null,
+        val pageLoading: Boolean = false,
         val pageLoadingError: Throwable? = null,
-        val refreshing: Boolean = false,
-        val pageIsLoading: Boolean = false,
         val lastPage: Page<T>? = null
     ) {
         val isReachedEnd: Boolean get() = lastPage?.isReachedEnd ?: false
-
-        fun dataIsEmpty(): Boolean {
-            return when (data) {
-                is Collection<*> -> data.isEmpty()
-                is Array<*> -> data.isEmpty()
-                is Lce.DataMaybeEmpty -> data.isEmpty()
-                else -> false
-            }
-        }
     }
 
     interface Page<T> {

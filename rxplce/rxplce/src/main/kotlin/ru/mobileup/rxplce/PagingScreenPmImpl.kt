@@ -3,33 +3,12 @@ package ru.mobileup.rxplce
 import io.reactivex.Observable
 import me.dmdev.rxpm.PresentationModel
 
-typealias PagingStateMapper<T> = ((pagingState: Paging.PagingState<T>) -> PagingScreenPmImpl.ScreenState<T>)
-
-class DefaultPagingStateMapper<T> : PagingStateMapper<T> {
-    override fun invoke(pagingState: Paging.PagingState<T>): PagingScreenPmImpl.ScreenState<T> {
-
-        val contentIsVisible = pagingState.data != null && pagingState.dataIsEmpty().not()
-        val emptyViewIsVisible = pagingState.data != null && pagingState.dataIsEmpty()
-        val errorViewIsVisible = pagingState.data == null && pagingState.refreshingError != null
-
-        return PagingScreenPmImpl.ScreenState(
-            data = pagingState.data,
-            isLoading = pagingState.data == null && pagingState.refreshing,
-            isRefreshing = pagingState.data != null && pagingState.refreshing,
-            contentIsVisible = contentIsVisible,
-            emptyViewIsVisible = emptyViewIsVisible,
-            errorViewIsVisible = errorViewIsVisible,
-            refreshEnabled = contentIsVisible || emptyViewIsVisible || errorViewIsVisible
-        )
-    }
-}
-
 class PagingScreenPmImpl<T>(
     private val paging: Paging<T>,
-    private val stateMapper: PagingStateMapper<T> = DefaultPagingStateMapper()
+    private val stateMapper: ScreenStateMapper<List<T>> = DefaultScreenStateMapper()
 ) : PresentationModel(), PagingScreenPm<T> {
 
-    override val data = State<List<T>>()
+    override val content = State<List<T>>()
 
     override val isLoading = State<Boolean>()
     override val isRefreshing = State<Boolean>()
@@ -49,19 +28,11 @@ class PagingScreenPmImpl<T>(
     override val retryLoadAction = Action<Unit>()
     override val retryLoadNextPageAction = Action<Unit>()
 
-    private val screenStateChanges = paging.state.map {
-        stateMapper(it)
-    }.share()
-
-    data class ScreenState<T>(
-        val data: List<T>?,
-        val isLoading: Boolean,
-        val isRefreshing: Boolean,
-        val refreshEnabled: Boolean,
-        val contentIsVisible: Boolean,
-        val emptyViewIsVisible: Boolean,
-        val errorViewIsVisible: Boolean
-    )
+    private val screenStateChanges = paging.state
+        .map {
+            stateMapper.mapLceStateToScreenState(it.loading, it.content, it.loadingError)
+        }
+        .share()
 
     override fun onCreate() {
         super.onCreate()
@@ -71,10 +42,10 @@ class PagingScreenPmImpl<T>(
             .map { it.data!! }
             .distinctUntilChanged { l1: List<T>, l2: List<T> -> l1 === l2 }
             .subscribe {
-                if (it.size <= data.valueOrNull?.size ?: 0) {
+                if (it.size <= content.valueOrNull?.size ?: 0) {
                     scrollToTop.consumer.accept(Unit)
                 }
-                data.consumer.accept(it)
+                content.consumer.accept(it)
             }
             .untilDestroy()
 
@@ -97,7 +68,7 @@ class PagingScreenPmImpl<T>(
             .untilDestroy()
 
         paging.state
-            .map { it.pageIsLoading }
+            .map { it.pageLoading }
             .distinctUntilChanged()
             .subscribe(pageIsLoading.consumer)
             .untilDestroy()

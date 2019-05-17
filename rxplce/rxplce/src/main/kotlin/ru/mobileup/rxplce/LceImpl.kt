@@ -8,7 +8,7 @@ import io.reactivex.functions.Consumer
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import ru.mobileup.rxplce.Lce.Action
-import ru.mobileup.rxplce.Lce.DataState
+import ru.mobileup.rxplce.Lce.State
 
 class LceImpl<T> private constructor(
     private val refreshData: Completable?,
@@ -31,13 +31,13 @@ class LceImpl<T> private constructor(
         dataChanges = dataChanges
     )
 
-    private val stateSubject = BehaviorSubject.createDefault<DataState<T>>(DataState()).toSerialized()
+    private val stateSubject = BehaviorSubject.createDefault<State<T>>(State()).toSerialized()
     private val actionSubject = PublishSubject.create<Action>().toSerialized()
 
     override val actions: Consumer<Action>
         get() = Consumer { actionSubject.onNext(it) }
 
-    override val state: Observable<DataState<T>>
+    override val state: Observable<State<T>>
 
     init {
 
@@ -60,57 +60,57 @@ class LceImpl<T> private constructor(
         state = actionSubject
             .withLatestFrom(
                 stateSubject,
-                BiFunction { _: Action, state: DataState<T> -> state }
+                BiFunction { _: Action, state: State<T> -> state }
             )
-            .filter { !it.refreshing }
+            .filter { !it.loading }
             .switchMap { observable }
             .mergeWith(
                 dataChanges
                     ?.map { InternalAction.UpdateData(it) }
                     ?: Observable.empty()
             )
-            .scan(DataState<T>()) { state, action ->
+            .scan(State<T>()) { state, action ->
                 when (action) {
                     is InternalAction.StartLoad -> {
                         state.copy(
-                            refreshing = true,
-                            refreshingError = null
+                            loading = true,
+                            loadingError = null
                         )
                     }
                     is InternalAction.LoadSuccess<*> -> {
                         @Suppress("UNCHECKED_CAST")
                         state.copy(
-                            refreshing = false,
-                            data = action.data as T
+                            loading = false,
+                            content = action.data as T
                         )
                     }
                     is InternalAction.LoadFail -> {
                         state.copy(
-                            refreshing = false,
-                            refreshingError = action.error
+                            loading = false,
+                            loadingError = action.error
                         )
                     }
                     is InternalAction.StartRefresh -> {
                         state.copy(
-                            refreshing = true,
-                            refreshingError = null
+                            loading = true,
+                            loadingError = null
                         )
                     }
                     is InternalAction.RefreshSuccess -> {
                         state.copy(
-                            refreshing = false
+                            loading = false
                         )
                     }
                     is InternalAction.RefreshFail -> {
                         state.copy(
-                            refreshing = false,
-                            refreshingError = action.error
+                            loading = false,
+                            loadingError = action.error
                         )
                     }
                     is InternalAction.UpdateData<*> -> {
                         @Suppress("UNCHECKED_CAST")
                         state.copy(
-                            data = action.data as T
+                            content = action.data as T
                         )
                     }
                 }
