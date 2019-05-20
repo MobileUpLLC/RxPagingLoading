@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jakewharton.rxbinding3.swiperefreshlayout.refreshes
@@ -71,6 +72,10 @@ class PagingSampleActivity : PmSupportActivity<PagingSamplePm>() {
         pm.contentViewVisible bindTo recyclerView.visibility()
         pm.emptyViewVisible bindTo emptyView.visibility()
         pm.errorViewVisible bindTo errorView.visibility()
+
+        pm.showError bindTo {
+            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+        }
 
         swipeRefreshLayout.refreshes() bindTo pm.refreshAction
         retryButton.clicks() bindTo pm.retryAction

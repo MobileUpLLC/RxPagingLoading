@@ -7,8 +7,8 @@ import ru.mobileup.rxplce.LoadingPm
 import ru.mobileup.rxplce.LoadingPmImpl
 
 class RefreshingSamplePm private constructor(
-    private val lceScreenPm: LoadingPmImpl<Array<Int>>
-) : PresentationModel(), LoadingPm<Array<Int>> by lceScreenPm {
+    private val loadingPm: LoadingPmImpl<Array<Int>>
+) : PresentationModel(), LoadingPm<Array<Int>> by loadingPm {
 
     companion object {
         fun createInstance(repository: RandomNumbersRepository): RefreshingSamplePm {
@@ -28,9 +28,9 @@ class RefreshingSamplePm private constructor(
     override fun onCreate() {
         super.onCreate()
 
-        lceScreenPm.attachToParent(this)
+        loadingPm.attachToParent(this)
 
-        lceScreenPm.errorNoticeObservable
+        loadingPm.errorNoticeObservable
             .subscribe { errorDialog.show("Refreshing Error") }
             .untilDestroy()
     }

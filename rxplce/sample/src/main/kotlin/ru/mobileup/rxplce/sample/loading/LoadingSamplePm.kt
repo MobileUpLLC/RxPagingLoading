@@ -8,8 +8,8 @@ import ru.mobileup.rxplce.LoadingPmImpl
 import ru.mobileup.rxplce.sample.loading.LoadingSamplePm.ContentString
 
 class LoadingSamplePm private constructor(
-    private val lceScreenPm: LoadingPmImpl<ContentString>
-) : PresentationModel(), LoadingPm<ContentString> by lceScreenPm {
+    private val loadingPm: LoadingPmImpl<ContentString>
+) : PresentationModel(), LoadingPm<ContentString> by loadingPm {
 
     data class ContentString(val text: String) : Emptyable {
         override fun isEmpty(): Boolean {
@@ -31,6 +31,6 @@ class LoadingSamplePm private constructor(
 
     override fun onCreate() {
         super.onCreate()
-        lceScreenPm.attachToParent(this)
+        loadingPm.attachToParent(this)
     }
 }
