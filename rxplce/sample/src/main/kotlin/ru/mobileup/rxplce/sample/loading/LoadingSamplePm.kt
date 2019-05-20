@@ -1,17 +1,17 @@
 package ru.mobileup.rxplce.sample.loading
 
 import me.dmdev.rxpm.PresentationModel
-import ru.mobileup.rxplce.Lce
-import ru.mobileup.rxplce.LceImpl
-import ru.mobileup.rxplce.LceScreenPm
-import ru.mobileup.rxplce.LceScreenPmImpl
+import ru.mobileup.rxplce.Emptyable
+import ru.mobileup.rxplce.LoadingOrdinary
+import ru.mobileup.rxplce.LoadingPm
+import ru.mobileup.rxplce.LoadingPmImpl
 import ru.mobileup.rxplce.sample.loading.LoadingSamplePm.ContentString
 
 class LoadingSamplePm private constructor(
-    private val lceScreenPm: LceScreenPmImpl<ContentString>
-) : PresentationModel(), LceScreenPm<ContentString> by lceScreenPm {
+    private val lceScreenPm: LoadingPmImpl<ContentString>
+) : PresentationModel(), LoadingPm<ContentString> by lceScreenPm {
 
-    data class ContentString(val text: String) : Lce.DataMaybeEmpty {
+    data class ContentString(val text: String) : Emptyable {
         override fun isEmpty(): Boolean {
             return text.isEmpty()
         }
@@ -20,9 +20,9 @@ class LoadingSamplePm private constructor(
     companion object {
         fun createInstance(repository: DataRepository): LoadingSamplePm {
             return LoadingSamplePm(
-                LceScreenPmImpl(
-                    LceImpl(
-                        loadingData = repository.loadData().map { ContentString(it) }
+                LoadingPmImpl(
+                    LoadingOrdinary(
+                        source = repository.loadData().map { ContentString(it) }
                     )
                 )
             )

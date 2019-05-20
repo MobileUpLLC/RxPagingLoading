@@ -23,14 +23,14 @@ class LoadingSampleActivity : PmSupportActivity<LoadingSamplePm>() {
 
     override fun onBindPresentationModel(pm: LoadingSamplePm) {
 
-        pm.data bindTo { contentView.text = it.text }
+        pm.content bindTo { contentView.text = it.text }
 
         pm.isLoading bindTo progressBar.visibility()
 
-        pm.contentVisible bindTo contentView.visibility()
+        pm.contentViewVisible bindTo contentView.visibility()
         pm.emptyViewVisible bindTo emptyView.visibility()
         pm.errorViewVisible bindTo errorView.visibility()
 
-        retryButton.clicks() bindTo pm.retryLoadAction
+        retryButton.clicks() bindTo pm.retryAction
     }
 }

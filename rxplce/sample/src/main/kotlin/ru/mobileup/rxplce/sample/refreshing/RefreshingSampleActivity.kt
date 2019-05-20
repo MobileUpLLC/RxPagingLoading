@@ -39,7 +39,7 @@ class RefreshingSampleActivity : PmSupportActivity<RefreshingSamplePm>() {
 
     override fun onBindPresentationModel(pm: RefreshingSamplePm) {
 
-        pm.data bindTo {
+        pm.content bindTo {
             val sb = StringBuilder("Random numbers:\n\n")
             contentView.text = it.joinTo(buffer = sb, separator = "\n").toString()
         }
@@ -48,7 +48,7 @@ class RefreshingSampleActivity : PmSupportActivity<RefreshingSamplePm>() {
         pm.refreshEnabled bindTo swipeRefreshLayout::setEnabled
         pm.isRefreshing bindTo swipeRefreshLayout::setRefreshing
 
-        pm.contentVisible bindTo contentView.visibility()
+        pm.contentViewVisible bindTo contentView.visibility()
         pm.emptyViewVisible bindTo emptyView.visibility()
         pm.errorViewVisible bindTo errorView.visibility()
 
@@ -60,7 +60,7 @@ class RefreshingSampleActivity : PmSupportActivity<RefreshingSamplePm>() {
         }
 
         swipeRefreshLayout.refreshes() bindTo pm.refreshAction
-        retryButton.clicks() bindTo pm.retryLoadAction
+        retryButton.clicks() bindTo pm.retryAction
     }
 
     private fun setupSettings() {

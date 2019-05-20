@@ -7,74 +7,72 @@ import io.reactivex.functions.Consumer
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import ru.mobileup.rxplce.Paging.Page
-import ru.mobileup.rxplce.Paging.PagingState
+import ru.mobileup.rxplce.Paging.State
 
 class PagingImpl<T>(
-    private val pagingSource: ((offset: Int, lastPage: Page<T>?) -> Single<Page<T>>)
+    private val pageSource: ((offset: Int, lastPage: Page<T>?) -> Single<Page<T>>)
 ) : Paging<T> {
 
-    private val stateSubject = BehaviorSubject.createDefault<PagingState<T>>(PagingState()).toSerialized()
+    private val stateSubject = BehaviorSubject.createDefault<State<T>>(State()).toSerialized()
     private val actionSubject = PublishSubject.create<Paging.Action>().toSerialized()
 
-    override val actions: Consumer<Paging.Action>
-        get() = Consumer { actionSubject.onNext(it) }
-
-    override val state: Observable<PagingState<T>>
+    override val state: Observable<State<T>>
+    override val actions: Consumer<Paging.Action> = Consumer { actionSubject.onNext(it) }
 
     init {
 
         state = actionSubject
             .withLatestFrom(
                 stateSubject,
-                BiFunction { action: Paging.Action, state: PagingState<T> ->
+                BiFunction { action: Paging.Action, state: State<T> ->
                     action to state
                 }
             )
             .filter { (action, state) ->
                 when (action) {
                     Paging.Action.LOAD_NEXT_PAGE -> {
-                        state.refreshing.not()
-                                && state.pageIsLoading.not()
-                                && state.isReachedEnd.not()
+                        state.loading.not()
+                                && state.pageLoading.not()
+                                && state.isEndReached.not()
                     }
-                    Paging.Action.REFRESH -> state.refreshing.not()
+                    Paging.Action.REFRESH -> state.loading.not()
                 }
             }
             .switchMap { (action, state) ->
 
                 when (action) {
                     Paging.Action.REFRESH -> {
-                        pagingSource(0, null)
+                        pageSource(0, null)
                             .toObservable()
                             .map<InternalAction> { InternalAction.RefreshSuccess(it) }
-                            .startWith(InternalAction.StartRefresh)
+                            .startWith(InternalAction.RefreshStart)
                             .onErrorReturn { InternalAction.RefreshFail(it) }
                     }
 
                     Paging.Action.LOAD_NEXT_PAGE -> {
-                        pagingSource(state.data?.size ?: 0, state.lastPage)
+                        pageSource(state.content?.size ?: 0, state.lastPage)
                             .toObservable()
                             .map<InternalAction> {
                                 InternalAction.PageLoadingSuccess(it)
                             }
-                            .startWith(InternalAction.StartPageLoading)
+                            .startWith(InternalAction.PageLoadingStart)
                             .onErrorReturn { InternalAction.PageLoadingFail(it) }
                     }
                 }
             }
-            .scan(PagingState<T>()) { state, action ->
+            .scan(State<T>()) { state, action ->
                 when (action) {
-                    InternalAction.StartRefresh -> {
+                    InternalAction.RefreshStart -> {
                         state.copy(
-                            refreshing = true,
-                            pageIsLoading = false,
-                            refreshingError = null
+                            loading = true,
+                            pageLoading = false,
+                            error = null
                         )
                     }
                     is InternalAction.RefreshFail -> {
                         state.copy(
-                            refreshing = false,
-                            refreshingError = action.error
+                            loading = false,
+                            error = action.error
                         )
                     }
                     is InternalAction.RefreshSuccess<*> -> {
@@ -82,21 +80,21 @@ class PagingImpl<T>(
                         @Suppress("UNCHECKED_CAST")
                         val page = action.page as Page<T>
 
-                        PagingState(
-                            data = page.list,
+                        State(
+                            content = page.items,
                             lastPage = page
                         )
                     }
-                    InternalAction.StartPageLoading -> {
+                    InternalAction.PageLoadingStart -> {
                         state.copy(
-                            pageIsLoading = true,
-                            pageLoadingError = null
+                            pageLoading = true,
+                            pageError = null
                         )
                     }
                     is InternalAction.PageLoadingFail -> {
                         state.copy(
-                            pageIsLoading = false,
-                            pageLoadingError = action.error
+                            pageLoading = false,
+                            pageError = action.error
                         )
                     }
                     is InternalAction.PageLoadingSuccess<*> -> {
@@ -104,8 +102,8 @@ class PagingImpl<T>(
                         val page = action.page as Page<T>
 
                         state.copy(
-                            pageIsLoading = false,
-                            data = state.data?.plus(page.list),
+                            pageLoading = false,
+                            content = state.content?.plus(page.items),
                             lastPage = page
                         )
                     }
@@ -118,10 +116,10 @@ class PagingImpl<T>(
     }
 
     private sealed class InternalAction {
-        object StartRefresh : InternalAction()
+        object RefreshStart : InternalAction()
         class RefreshSuccess<T>(val page: Page<T>) : InternalAction()
         class RefreshFail(val error: Throwable) : InternalAction()
-        object StartPageLoading : InternalAction()
+        object PageLoadingStart : InternalAction()
         class PageLoadingSuccess<T>(val page: Page<T>) : InternalAction()
         class PageLoadingFail(val error: Throwable) : InternalAction()
     }

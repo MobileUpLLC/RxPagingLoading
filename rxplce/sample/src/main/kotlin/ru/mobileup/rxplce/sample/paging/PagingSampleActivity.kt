@@ -56,7 +56,7 @@ class PagingSampleActivity : PmSupportActivity<PagingSamplePm>() {
 
     override fun onBindPresentationModel(pm: PagingSamplePm) {
 
-        pm.data bindTo { itemsAdapter.submitList(it) }
+        pm.content bindTo { itemsAdapter.submitList(it) }
 
         pm.scrollToTop bindTo { recyclerView?.smoothScrollToPosition(0) }
 
@@ -68,13 +68,13 @@ class PagingSampleActivity : PmSupportActivity<PagingSamplePm>() {
         pm.refreshEnabled bindTo swipeRefreshLayout::setEnabled
         pm.isRefreshing bindTo swipeRefreshLayout::setRefreshing
 
-        pm.contentVisible bindTo recyclerView.visibility()
+        pm.contentViewVisible bindTo recyclerView.visibility()
         pm.emptyViewVisible bindTo emptyView.visibility()
         pm.errorViewVisible bindTo errorView.visibility()
 
         swipeRefreshLayout.refreshes() bindTo pm.refreshAction
-        retryButton.clicks() bindTo pm.retryLoadAction
-        itemsAdapter.footerView.retryButton.clicks() bindTo pm.retryLoadNextPageAction
+        retryButton.clicks() bindTo pm.retryAction
+        itemsAdapter.footerView.retryButton.clicks() bindTo pm.retryNextPageAction
     }
 
     private fun setupSettings() {
