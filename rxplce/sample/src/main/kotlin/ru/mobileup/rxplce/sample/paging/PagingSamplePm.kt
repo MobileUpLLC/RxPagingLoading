@@ -3,8 +3,8 @@ package ru.mobileup.rxplce.sample.paging
 import me.dmdev.rxpm.PresentationModel
 import ru.mobileup.rxplce.Paging
 import ru.mobileup.rxplce.PagingImpl
-import ru.mobileup.rxplce.PagingPm
-import ru.mobileup.rxplce.PagingPmImpl
+import ru.mobileup.rxplce.pm.PagingPm
+import ru.mobileup.rxplce.pm.PagingPmImpl
 
 class PagingSamplePm private constructor(
     private val pagingPm: PagingPmImpl<Item>

@@ -1,2 +1,3 @@
 include ':rxplce:rxplce'
+include ':rxplce:pm'
 include ':rxplce:sample'

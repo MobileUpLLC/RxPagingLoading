@@ -1,10 +1,10 @@
 package ru.mobileup.rxplce.sample.loading
 
 import me.dmdev.rxpm.PresentationModel
-import ru.mobileup.rxplce.Emptyable
 import ru.mobileup.rxplce.LoadingOrdinary
-import ru.mobileup.rxplce.LoadingPm
-import ru.mobileup.rxplce.LoadingPmImpl
+import ru.mobileup.rxplce.pm.Emptyable
+import ru.mobileup.rxplce.pm.LoadingPm
+import ru.mobileup.rxplce.pm.LoadingPmImpl
 import ru.mobileup.rxplce.sample.loading.LoadingSamplePm.ContentString
 
 class LoadingSamplePm private constructor(

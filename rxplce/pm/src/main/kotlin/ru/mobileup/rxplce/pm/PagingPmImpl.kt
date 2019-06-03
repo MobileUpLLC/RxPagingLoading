@@ -1,33 +1,45 @@
-package ru.mobileup.rxplce
+package ru.mobileup.rxplce.pm
 
 import io.reactivex.Observable
 import me.dmdev.rxpm.PresentationModel
+import ru.mobileup.rxplce.Paging
 
-class LoadingPmImpl<T>(
-    private val loading: Loading<T>,
-    private val stateMapper: ScreenStateMapper<T> = ScreenStateMapperDefault()
-) : PresentationModel(), LoadingPm<T> {
+class PagingPmImpl<T>(
+    private val paging: Paging<T>,
+    private val stateMapper: ScreenStateMapper<List<T>> = ScreenStateMapperDefault()
+) : PresentationModel(), PagingPm<T> {
 
-    override val content = State<T>()
+    override val content = State<List<T>>()
 
     override val isLoading = State<Boolean>()
     override val isRefreshing = State<Boolean>()
+    override val pageIsLoading = State<Boolean>()
 
     override val refreshEnabled = State<Boolean>()
 
     override val contentViewVisible = State<Boolean>()
     override val emptyViewVisible = State<Boolean>()
     override val errorViewVisible = State<Boolean>()
+    override val pageErrorVisible = State<Boolean>()
+
+    override val scrollToTop = Command<Unit>()
 
     override val refreshAction = Action<Unit>()
+    override val nextPageAction = Action<Unit>()
     override val retryAction = Action<Unit>()
+    override val retryNextPageAction = Action<Unit>()
 
-    val errorNoticeObservable: Observable<Throwable> = loading.state
+    val errorNoticeObservable: Observable<Throwable> = paging.state
         .filter { it.content != null && it.error != null }
         .map { it.error!! }
         .distinctUntilChanged()
 
-    private val screenStateChanges = loading.state
+    val pageErrorObservable: Observable<Throwable> = paging.state
+        .filter { it.pageError != null }
+        .map { it.pageError!! }
+        .distinctUntilChanged()
+
+    private val screenStateChanges = paging.state
         .map {
             stateMapper.mapToScreenState(it.loading, it.content, it.error)
         }
@@ -39,7 +51,13 @@ class LoadingPmImpl<T>(
         screenStateChanges
             .filter { it.content != null }
             .map { it.content!! }
-            .subscribe(content.consumer)
+            .distinctUntilChanged { l1: List<T>, l2: List<T> -> l1 === l2 }
+            .subscribe {
+                if (it.size <= content.valueOrNull?.size ?: 0) {
+                    scrollToTop.consumer.accept(Unit)
+                }
+                content.consumer.accept(it)
+            }
             .untilDestroy()
 
         screenStateChanges
@@ -60,6 +78,12 @@ class LoadingPmImpl<T>(
             .subscribe(refreshEnabled.consumer)
             .untilDestroy()
 
+        paging.state
+            .map { it.pageLoading }
+            .distinctUntilChanged()
+            .subscribe(pageIsLoading.consumer)
+            .untilDestroy()
+
         screenStateChanges
             .map { it.contentViewVisible }
             .distinctUntilChanged()
@@ -78,10 +102,29 @@ class LoadingPmImpl<T>(
             .subscribe(errorViewVisible.consumer)
             .untilDestroy()
 
-        Observable.merge(refreshAction.observable, retryAction.observable)
+        paging.state
+            .map { it.pageError != null }
+            .distinctUntilChanged()
+            .subscribe(pageErrorVisible.consumer)
+            .untilDestroy()
+
+        Observable
+            .merge(
+                refreshAction.observable,
+                retryAction.observable
+            )
             .startWith(Unit)
-            .map { Loading.Action.REFRESH }
-            .subscribe(loading.actions)
+            .map { Paging.Action.REFRESH }
+            .subscribe(paging.actions)
+            .untilDestroy()
+
+        Observable
+            .merge(
+                nextPageAction.observable,
+                retryNextPageAction.observable
+            )
+            .map { Paging.Action.LOAD_NEXT_PAGE }
+            .subscribe(paging.actions)
             .untilDestroy()
     }
 }

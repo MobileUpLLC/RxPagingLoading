@@ -1,4 +1,4 @@
-package ru.mobileup.rxplce
+package ru.mobileup.rxplce.pm
 
 class ScreenStateMapperDefault<T> : ScreenStateMapper<T> {
 

@@ -3,8 +3,8 @@ package ru.mobileup.rxplce.sample.refreshing
 import me.dmdev.rxpm.PresentationModel
 import me.dmdev.rxpm.widget.dialogControl
 import ru.mobileup.rxplce.LoadingAssembled
-import ru.mobileup.rxplce.LoadingPm
-import ru.mobileup.rxplce.LoadingPmImpl
+import ru.mobileup.rxplce.pm.LoadingPm
+import ru.mobileup.rxplce.pm.LoadingPmImpl
 
 class RefreshingSamplePm private constructor(
     private val loadingPm: LoadingPmImpl<Array<Int>>

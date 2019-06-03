@@ -45,5 +45,6 @@ dependencies {
     implementation libraries.rxBindingSwiperefreshlayout
 
     implementation project(path: ':rxplce:rxplce')
+    implementation project(path: ':rxplce:pm')
 
 }
