@@ -66,7 +66,6 @@ class LoadingAssembled<T>(
                     }
                 }
             }
-            .distinctUntilChanged()
             .doOnNext { stateSubject.onNext(it) }
             .share()
     }
