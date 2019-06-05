@@ -9,6 +9,11 @@ import io.reactivex.subjects.PublishSubject
 import ru.mobileup.rxplce.Loading.Action
 import ru.mobileup.rxplce.Loading.State
 
+/**
+ * Simple [implementation][Loading] of the data loader.
+ *
+ * @param[source] the source of data.
+ */
 class LoadingOrdinary<T>(
     source: Single<T>
 ) : Loading<T> {
