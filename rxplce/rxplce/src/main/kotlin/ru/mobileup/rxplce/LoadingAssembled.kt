@@ -9,6 +9,13 @@ import io.reactivex.subjects.PublishSubject
 import ru.mobileup.rxplce.Loading.Action
 import ru.mobileup.rxplce.Loading.State
 
+/**
+ * The data loader [implementation][Loading].
+ * Used when there is a [completable][Completable] for refreshing data and a separate stream for observing the same data.
+ *
+ * @param[refresh] refreshes the data.
+ * @param[updates] observer of the data.
+ */
 class LoadingAssembled<T>(
     refresh: Completable,
     updates: Observable<T>
