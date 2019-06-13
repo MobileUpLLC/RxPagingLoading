@@ -5,8 +5,8 @@ import io.reactivex.functions.Consumer
 
 /**
  *
- * This interface describes the [input][actions] and [output][state] for a state machine.
- * It is used to implement the data loading and paging.
+ * This interface describes [input][actions] and [output][state] of a state machine.
+ * It is used for implementing data loading and paging.
  *
  * @see PagingImpl
  */
@@ -54,7 +54,7 @@ interface Paging<T> {
 
     /**
      * Describes the page data.
-     * Here you can to define custom logic that the end of the list is reached.
+     * Here you can define custom logic to determine that the end of the list is reached.
      */
     interface Page<T> {
         val items: List<T>

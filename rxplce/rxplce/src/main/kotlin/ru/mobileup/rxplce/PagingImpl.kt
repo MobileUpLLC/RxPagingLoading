@@ -10,9 +10,9 @@ import ru.mobileup.rxplce.Paging.Page
 import ru.mobileup.rxplce.Paging.State
 
 /**
- * This class implements the data [loading and paging][Paging].
+ * This class implements data [loading and paging][Paging].
  *
- * @param[pageSource] is lambda that return the source to load the next page.
+ * @param[pageSource] a lambda that return the source to load the next page.
  */
 class PagingImpl<T>(
     private val pageSource: ((offset: Int, lastPage: Page<T>?) -> Single<Page<T>>)

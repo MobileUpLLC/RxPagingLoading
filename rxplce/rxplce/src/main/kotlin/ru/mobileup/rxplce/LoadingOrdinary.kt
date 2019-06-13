@@ -10,7 +10,7 @@ import ru.mobileup.rxplce.Loading.Action
 import ru.mobileup.rxplce.Loading.State
 
 /**
- * Simple [implementation][Loading] of the data loader.
+ * Simple data loader [implementation][Loading].
  *
  * @param[source] the source of data.
  */
