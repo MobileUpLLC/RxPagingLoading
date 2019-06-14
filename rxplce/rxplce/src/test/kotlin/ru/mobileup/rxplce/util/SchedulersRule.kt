@@ -1,5 +1,6 @@
 package ru.mobileup.rxplce.util
 
+import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.schedulers.TestScheduler
@@ -17,6 +18,7 @@ class SchedulersRule(private val useTestScheduler: Boolean = false) : ExternalRe
 
     override fun before() {
         RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
 
         val computationScheduler = if (useTestScheduler) {
             _testScheduler = TestScheduler()
@@ -29,5 +31,6 @@ class SchedulersRule(private val useTestScheduler: Boolean = false) : ExternalRe
 
     override fun after() {
         RxJavaPlugins.reset()
+        RxAndroidPlugins.reset()
     }
 }
