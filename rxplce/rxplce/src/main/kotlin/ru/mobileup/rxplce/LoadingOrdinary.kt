@@ -2,6 +2,7 @@ package ru.mobileup.rxplce
 
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Consumer
 import io.reactivex.subjects.BehaviorSubject
@@ -39,6 +40,7 @@ class LoadingOrdinary<T>(
                     .startWith(InternalAction.LoadStart)
                     .onErrorReturn { InternalAction.LoadFail(it) }
             }
+            .observeOn(AndroidSchedulers.mainThread())
             .scan(State<T>()) { state, action ->
                 when (action) {
                     is InternalAction.LoadStart -> {

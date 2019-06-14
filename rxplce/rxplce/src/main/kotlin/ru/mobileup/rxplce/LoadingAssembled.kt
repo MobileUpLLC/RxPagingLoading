@@ -2,6 +2,7 @@ package ru.mobileup.rxplce
 
 import io.reactivex.Completable
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Consumer
 import io.reactivex.subjects.BehaviorSubject
@@ -46,6 +47,7 @@ class LoadingAssembled<T>(
             .mergeWith(
                 updates.map { InternalAction.UpdateData(it) }
             )
+            .observeOn(AndroidSchedulers.mainThread())
             .scan(State<T>()) { state, action ->
                 when (action) {
                     is InternalAction.RefreshStart -> {

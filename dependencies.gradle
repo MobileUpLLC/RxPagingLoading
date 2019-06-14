@@ -10,6 +10,7 @@ ext.versions = [
         'junit'              : '4.12',
 
         'rxJava'             : '2.2.9',
+        'rxAndroid'          : '2.1.1',
         'rxPm'               : '1.2.4',
         'rxRelay'            : '2.1.0',
         'rxBinding'          : '3.0.0-alpha2',
@@ -28,6 +29,7 @@ ext.libraries = [
         recyclerView               : "androidx.recyclerview:recyclerview:${versions.recyclerView}",
 
         rxJava                     : "io.reactivex.rxjava2:rxjava:${versions.rxJava}",
+        rxAndroid                  : "io.reactivex.rxjava2:rxandroid:${versions.rxAndroid}",
         rxPm                       : "me.dmdev.rxpm:rxpm:${versions.rxPm}",
         rxRelay                    : "com.jakewharton.rxrelay2:rxrelay:${versions.rxRelay}",
         rxBinding                  : "com.jakewharton.rxbinding3:rxbinding:${versions.rxBinding}",
