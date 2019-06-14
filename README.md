@@ -1,7 +1,7 @@
 # Reactive Paging Loading Content Error (PLCE)
 
 This library implements reactive paging and data loading.
-It solves a LCE-state problem and implements a pagination. The basis of this solution is using Unidirectional Data Flow pattern. This library depends from RxJava and uses its interfaces like `Observable` and `Consumer` to represent API.
+It solves a LCE-state problem and implements a pagination. The basis of this solution is the usage of Unidirectional Data Flow pattern. This library depends on RxJava and uses its interfaces like `Observable` and `Consumer` to represent API.
 
 ## Simple data loading
 
@@ -26,14 +26,14 @@ interface Loading<T> {
 
 It includes:
 - `State` — represents LCE-state.
-- `Observable` - observe changes of the LCE-state.
+- `Observable` - observes changes of the LCE-state.
 - `Consumer` - receives appropriate Action.
 
 There are two implementations:
 
 - LoadingOrdinary
 
-This class takes a data source as Single into the constructor:
+This class takes a data source as a Single into the constructor:
 
 ```Kotlin
 LoadingOrdinary(
@@ -86,7 +86,7 @@ interface Paging<T> {
 
 Note, the `State` also stores the last loaded page. It is needed to download the following page, as well as to determine the end of the list.
 
-`Page` is an interface, it is made for flexibility. Your data source can map a page data to the own class. For example, you can wish to store an identifier of the last entity, or a link to the next page, or any data depending of your back-end requirements. The last page will be passed to a lambda `pageSource`, which should be passed to the constructor of the `PagingImpl`:
+`Page` is an interface which is made for flexibility. Your data source can map a page data to the own class. For example, you can wish to store an identifier of the last entity, or a link to the next page, or any data depending on your back-end requirements. The last page will be passed to a lambda `pageSource`, which should be passed to the constructor of the `PagingImpl`:
 
 ```Kotlin
 
