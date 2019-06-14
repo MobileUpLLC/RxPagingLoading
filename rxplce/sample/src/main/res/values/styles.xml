@@ -12,6 +12,11 @@
     <style name="AppToolbar" parent="Widget.AppCompat.Toolbar">
         <item name="android:elevation">8dp</item>
         <item name="android:background">?attr/colorPrimary</item>
+        <item name="titleTextAppearance">@style/ToolbarTitleTextAppearance</item>
+    </style>
+
+    <style name="ToolbarTitleTextAppearance" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
 </resources>
