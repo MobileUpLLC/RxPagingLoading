@@ -29,8 +29,8 @@ dependencies {
     testImplementation libraries.rxRelay
 
     implementation libraries.kotlinStdLib
-    implementation libraries.rxPm
-    implementation libraries.rxJava
+    compileOnly libraries.rxPm
+    compileOnly libraries.rxJava
 
     compileOnly project(path: ':rxplce')
 }
