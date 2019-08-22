@@ -32,5 +32,5 @@ dependencies {
     implementation libraries.rxPm
     implementation libraries.rxJava
 
-    compileOnly project(path: ':rxplce:rxplce')
+    compileOnly project(path: ':rxplce')
 }
