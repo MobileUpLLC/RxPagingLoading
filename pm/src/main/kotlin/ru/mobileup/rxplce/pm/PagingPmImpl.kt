@@ -12,7 +12,7 @@ class PagingPmImpl<T>(
     private val stateMapper: ScreenStateMapper<List<T>> = ScreenStateMapperDefault()
 ) : PresentationModel(), PagingPm<T> {
 
-    override val content = state<List<T>>()
+    override val content = state<List<T>>(diffStrategy = null)
 
     override val isLoading = state<Boolean>()
     override val isRefreshing = state<Boolean>()
@@ -38,8 +38,8 @@ class PagingPmImpl<T>(
         .distinctUntilChanged()
 
     val pageErrorObservable: Observable<Throwable> = paging.state
-        .filter { it.pageError != null }
-        .map { it.pageError!! }
+        .filter { it.pagingError != null }
+        .map { it.pagingError!! }
         .distinctUntilChanged()
 
     private val screenStateChanges = paging.state
@@ -106,7 +106,7 @@ class PagingPmImpl<T>(
             .untilDestroy()
 
         paging.state
-            .map { it.pageError != null }
+            .map { it.pagingError != null }
             .distinctUntilChanged()
             .subscribe(pageErrorVisible.consumer)
             .untilDestroy()

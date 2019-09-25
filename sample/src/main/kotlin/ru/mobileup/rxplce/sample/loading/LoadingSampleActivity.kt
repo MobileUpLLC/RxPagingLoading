@@ -19,7 +19,7 @@ class LoadingSampleActivity : PmActivity<LoadingSamplePm>() {
     }
 
     override fun providePresentationModel(): LoadingSamplePm {
-        return LoadingSamplePm.createInstance(DataRepository())
+        return LoadingSamplePm(DataRepository())
     }
 
     override fun onBindPresentationModel(pm: LoadingSamplePm) {

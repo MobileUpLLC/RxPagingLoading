@@ -95,13 +95,13 @@ class PagingImpl<T>(
                     InternalAction.PageLoadingStart -> {
                         state.copy(
                             pageLoading = true,
-                            pageError = null
+                            pagingError = null
                         )
                     }
                     is InternalAction.PageLoadingFail -> {
                         state.copy(
                             pageLoading = false,
-                            pageError = action.error
+                            pagingError = action.error
                         )
                     }
                     is InternalAction.PageLoadingSuccess<*> -> {

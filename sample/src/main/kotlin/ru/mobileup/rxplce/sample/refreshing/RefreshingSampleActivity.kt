@@ -36,7 +36,7 @@ class RefreshingSampleActivity : PmActivity<RefreshingSamplePm>() {
     }
 
     override fun providePresentationModel(): RefreshingSamplePm {
-        return RefreshingSamplePm.createInstance(randomNumbersRepository)
+        return RefreshingSamplePm(randomNumbersRepository)
     }
 
     override fun onBindPresentationModel(pm: RefreshingSamplePm) {

@@ -34,7 +34,7 @@ interface Paging<T> {
      * @property[loading] indicates that the first page is loading or updating.
      * @property[error] an error occurred when loading or updating data (the first page loading).
      * @property[pageLoading] indicates that the next page is loading.
-     * @property[pageError] an error occurred when loading the next page.
+     * @property[pagingError] an error occurred when loading the next page.
      * @property[lastPage] the last page has been loaded.
      */
     data class State<T>(
@@ -42,7 +42,7 @@ interface Paging<T> {
         val loading: Boolean = false,
         val error: Throwable? = null,
         val pageLoading: Boolean = false,
-        val pageError: Throwable? = null,
+        val pagingError: Throwable? = null,
         val lastPage: Page<T>? = null
     ) {
 
@@ -90,8 +90,8 @@ interface Paging<T> {
 
     fun pagingErrorChanges(): Observable<Throwable> {
         return state
-            .filter { it.pageError != null }
-            .map { it.pageError!! }
+            .filter { it.pagingError != null }
+            .map { it.pagingError!! }
             .distinctUntilChanged()
     }
 }

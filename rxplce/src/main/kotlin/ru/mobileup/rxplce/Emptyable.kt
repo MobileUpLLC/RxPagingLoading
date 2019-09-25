@@ -1,4 +1,4 @@
-package ru.mobileup.rxplce.pm
+package ru.mobileup.rxplce
 
 interface Emptyable {
     fun isEmpty(): Boolean

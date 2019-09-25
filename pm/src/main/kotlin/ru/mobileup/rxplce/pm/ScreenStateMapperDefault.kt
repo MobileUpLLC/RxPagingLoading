@@ -1,5 +1,7 @@
 package ru.mobileup.rxplce.pm
 
+import ru.mobileup.rxplce.contentIsEmpty
+
 class ScreenStateMapperDefault<T> : ScreenStateMapper<T> {
 
     override fun mapToScreenState(loading: Boolean, content: T?, error: Throwable?): ScreenState<T> {
@@ -17,14 +19,5 @@ class ScreenStateMapperDefault<T> : ScreenStateMapper<T> {
             errorViewVisible = errorViewVisible,
             refreshEnabled = contentVisible || emptyViewVisible || errorViewVisible
         )
-    }
-
-    private fun contentIsEmpty(content: Any?): Boolean {
-        return when (content) {
-            is Collection<*> -> content.isEmpty()
-            is Array<*> -> content.isEmpty()
-            is Emptyable -> content.isEmpty()
-            else -> false
-        }
     }
 }

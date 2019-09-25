@@ -41,7 +41,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -63,7 +63,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -72,7 +72,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -81,7 +81,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -103,7 +103,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -112,7 +112,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -121,7 +121,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = refreshingError,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -144,7 +144,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -153,7 +153,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -162,7 +162,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -171,7 +171,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -180,7 +180,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3, 4, 5, 6),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(4, 5, 6), false)
@@ -207,7 +207,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -216,7 +216,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -225,7 +225,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -234,7 +234,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -243,7 +243,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = pageLoadingError,
+                pagingError = pageLoadingError,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -269,7 +269,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -278,7 +278,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -287,7 +287,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -296,7 +296,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -305,7 +305,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3, 4, 5, 6),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(4, 5, 6), true)
@@ -333,7 +333,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -342,7 +342,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -351,7 +351,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -384,7 +384,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -393,7 +393,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -402,7 +402,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -411,7 +411,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -420,7 +420,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3, 4, 5, 6),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(4, 5, 6), false)
@@ -447,7 +447,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -456,7 +456,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -465,7 +465,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -496,7 +496,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = null
@@ -505,7 +505,7 @@ class PagingPmImplTest {
             State(
                 content = null,
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = null
@@ -514,7 +514,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -523,7 +523,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = true,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -532,7 +532,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = true,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)
@@ -541,7 +541,7 @@ class PagingPmImplTest {
             State(
                 content = listOf(1, 2, 3),
                 error = null,
-                pageError = null,
+                pagingError = null,
                 loading = false,
                 pageLoading = false,
                 lastPage = DataPage(listOf(1, 2, 3), false)

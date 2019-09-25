@@ -61,3 +61,48 @@ interface Loading<T> {
             .distinctUntilChanged()
     }
 }
+
+fun <T> Loading<T>.contentViewVisible(): Observable<Boolean> {
+    return state.map {
+        it.content != null && contentIsEmpty(it.content).not()
+    }.distinctUntilChanged()
+}
+
+fun <T> Loading<T>.emptyViewVisible(): Observable<Boolean> {
+    return state.map {
+        it.content != null && contentIsEmpty(it.content)
+    }.distinctUntilChanged()
+}
+
+fun <T> Loading<T>.errorViewVisible(): Observable<Boolean> {
+    return state.map {
+        it.content == null && it.error != null
+    }.distinctUntilChanged()
+}
+
+fun <T> Loading<T>.isLoading(): Observable<Boolean> {
+    return state.map {
+        it.content == null && it.loading
+    }.distinctUntilChanged()
+}
+
+fun <T> Loading<T>.isRefreshing(): Observable<Boolean> {
+    return state.map {
+        it.content != null && it.loading
+    }.distinctUntilChanged()
+}
+
+fun <T> Loading<T>.refreshEnabled(): Observable<Boolean> {
+    return isLoading()
+        .map { it.not() }
+        .distinctUntilChanged()
+}
+
+fun contentIsEmpty(content: Any?): Boolean {
+    return when (content) {
+        is Collection<*> -> content.isEmpty()
+        is Array<*> -> content.isEmpty()
+        is Emptyable -> content.isEmpty()
+        else -> false
+    }
+}
