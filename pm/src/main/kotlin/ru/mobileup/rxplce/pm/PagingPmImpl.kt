@@ -2,6 +2,9 @@ package ru.mobileup.rxplce.pm
 
 import io.reactivex.Observable
 import me.dmdev.rxpm.PresentationModel
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import ru.mobileup.rxplce.Paging
 
 class PagingPmImpl<T>(
@@ -9,25 +12,25 @@ class PagingPmImpl<T>(
     private val stateMapper: ScreenStateMapper<List<T>> = ScreenStateMapperDefault()
 ) : PresentationModel(), PagingPm<T> {
 
-    override val content = State<List<T>>()
+    override val content = state<List<T>>()
 
-    override val isLoading = State<Boolean>()
-    override val isRefreshing = State<Boolean>()
-    override val pageIsLoading = State<Boolean>()
+    override val isLoading = state<Boolean>()
+    override val isRefreshing = state<Boolean>()
+    override val pageIsLoading = state<Boolean>()
 
-    override val refreshEnabled = State<Boolean>()
+    override val refreshEnabled = state<Boolean>()
 
-    override val contentViewVisible = State<Boolean>()
-    override val emptyViewVisible = State<Boolean>()
-    override val errorViewVisible = State<Boolean>()
-    override val pageErrorVisible = State<Boolean>()
+    override val contentViewVisible = state<Boolean>()
+    override val emptyViewVisible = state<Boolean>()
+    override val errorViewVisible = state<Boolean>()
+    override val pageErrorVisible = state<Boolean>()
 
-    override val scrollToTop = Command<Unit>()
+    override val scrollToTop = command<Unit>()
 
-    override val refreshAction = Action<Unit>()
-    override val nextPageAction = Action<Unit>()
-    override val retryAction = Action<Unit>()
-    override val retryNextPageAction = Action<Unit>()
+    override val refreshAction = action<Unit>()
+    override val nextPageAction = action<Unit>()
+    override val retryAction = action<Unit>()
+    override val retryNextPageAction = action<Unit>()
 
     val errorNoticeObservable: Observable<Throwable> = paging.state
         .filter { it.content != null && it.error != null }

@@ -2,6 +2,8 @@ package ru.mobileup.rxplce.pm
 
 import io.reactivex.Observable
 import me.dmdev.rxpm.PresentationModel
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import ru.mobileup.rxplce.Loading
 
 class LoadingPmImpl<T>(
@@ -9,19 +11,19 @@ class LoadingPmImpl<T>(
     private val stateMapper: ScreenStateMapper<T> = ScreenStateMapperDefault()
 ) : PresentationModel(), LoadingPm<T> {
 
-    override val content = State<T>()
+    override val content = state<T>()
 
-    override val isLoading = State<Boolean>()
-    override val isRefreshing = State<Boolean>()
+    override val isLoading = state<Boolean>()
+    override val isRefreshing = state<Boolean>()
 
-    override val refreshEnabled = State<Boolean>()
+    override val refreshEnabled = state<Boolean>()
 
-    override val contentViewVisible = State<Boolean>()
-    override val emptyViewVisible = State<Boolean>()
-    override val errorViewVisible = State<Boolean>()
+    override val contentViewVisible = state<Boolean>()
+    override val emptyViewVisible = state<Boolean>()
+    override val errorViewVisible = state<Boolean>()
 
-    override val refreshAction = Action<Unit>()
-    override val retryAction = Action<Unit>()
+    override val refreshAction = action<Unit>()
+    override val retryAction = action<Unit>()
 
     val errorNoticeObservable: Observable<Throwable> = loading.state
         .filter { it.content != null && it.error != null }

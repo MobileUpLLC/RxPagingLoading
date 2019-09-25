@@ -1,6 +1,7 @@
 package ru.mobileup.rxplce.sample.paging
 
 import me.dmdev.rxpm.PresentationModel
+import me.dmdev.rxpm.command
 import ru.mobileup.rxplce.Paging
 import ru.mobileup.rxplce.PagingImpl
 import ru.mobileup.rxplce.pm.PagingPm
@@ -36,7 +37,7 @@ class PagingSamplePm private constructor(
         }
     }
 
-    val showError = Command<String>()
+    val showError = command<String>()
 
     override fun onCreate() {
         super.onCreate()

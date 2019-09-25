@@ -13,10 +13,12 @@ import kotlinx.android.synthetic.main.activity_refreshing.*
 import kotlinx.android.synthetic.main.layout_empty_view.*
 import kotlinx.android.synthetic.main.layout_error_view.*
 import kotlinx.android.synthetic.main.layout_progress_view.*
-import me.dmdev.rxpm.base.PmSupportActivity
+import me.dmdev.rxpm.base.PmActivity
+import me.dmdev.rxpm.bindTo
+import me.dmdev.rxpm.widget.bindTo
 import ru.mobileup.rxplce.sample.R
 
-class RefreshingSampleActivity : PmSupportActivity<RefreshingSamplePm>() {
+class RefreshingSampleActivity : PmActivity<RefreshingSamplePm>() {
 
     val randomNumbersRepository = RandomNumbersRepository()
 

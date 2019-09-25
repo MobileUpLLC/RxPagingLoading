@@ -1,20 +1,21 @@
 package ru.mobileup.rxplce.pm
 
-import me.dmdev.rxpm.PresentationModel
+import me.dmdev.rxpm.Action
+import me.dmdev.rxpm.State
 
 interface LoadingPm<T> {
 
-    val content: PresentationModel.State<T>
+    val content: State<T>
 
-    val isLoading: PresentationModel.State<Boolean>
-    val isRefreshing: PresentationModel.State<Boolean>
+    val isLoading: State<Boolean>
+    val isRefreshing: State<Boolean>
 
-    val refreshEnabled: PresentationModel.State<Boolean>
+    val refreshEnabled: State<Boolean>
 
-    val contentViewVisible: PresentationModel.State<Boolean>
-    val emptyViewVisible: PresentationModel.State<Boolean>
-    val errorViewVisible: PresentationModel.State<Boolean>
+    val contentViewVisible: State<Boolean>
+    val emptyViewVisible: State<Boolean>
+    val errorViewVisible: State<Boolean>
 
-    val refreshAction: PresentationModel.Action<Unit>
-    val retryAction: PresentationModel.Action<Unit>
+    val refreshAction: Action<Unit>
+    val retryAction: Action<Unit>
 }
