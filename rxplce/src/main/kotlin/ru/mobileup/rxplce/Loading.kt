@@ -40,4 +40,24 @@ interface Loading<T> {
         val loading: Boolean = false,
         val error: Throwable? = null
     )
+
+    fun contentChanges(): Observable<T> {
+        return state
+            .filter { it.content != null }
+            .map { it.content!! }
+            .distinctUntilChanged { l1, l2 -> l1 === l2 }
+    }
+
+    fun loadingChanges(): Observable<Boolean> {
+        return state
+            .map { it.loading }
+            .distinctUntilChanged()
+    }
+
+    fun errorChanges(): Observable<Throwable> {
+        return state
+            .filter { it.error != null }
+            .map { it.error!! }
+            .distinctUntilChanged()
+    }
 }
