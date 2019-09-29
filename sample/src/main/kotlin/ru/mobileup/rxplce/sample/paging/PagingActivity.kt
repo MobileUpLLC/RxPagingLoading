@@ -68,6 +68,7 @@ class PagingActivity : PmActivity<PagingPm>() {
 
         pm.isLoading bindTo progressBar.visibility()
         pm.isRefreshing bindTo swipeRefreshLayout::setRefreshing
+        pm.refreshEnabled bindTo swipeRefreshLayout::setEnabled
 
         pm.contentViewVisible bindTo recyclerView.visibility()
         pm.emptyViewVisible bindTo emptyView.visibility()

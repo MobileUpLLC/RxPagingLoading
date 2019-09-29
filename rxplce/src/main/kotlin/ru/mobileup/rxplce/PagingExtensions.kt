@@ -52,6 +52,12 @@ fun <T> Paging<T>.isRefreshing(): Observable<Boolean> {
     }.distinctUntilChanged()
 }
 
+fun <T> Paging<T>.refreshEnabled(): Observable<Boolean> {
+    return isLoading()
+        .map { it.not() }
+        .distinctUntilChanged()
+}
+
 fun <T> Paging<T>.pageIsLoading(): Observable<Boolean> {
     return state
         .map { it.pageLoading }

@@ -11,7 +11,7 @@ class PagingPm(repository: ItemsRepository) : BasePresentationModel() {
         override val isEndReached: Boolean
     ) : Paging.Page<Item>
 
-    private val loader = PagingImpl<Item>(
+    private val paging = PagingImpl<Item>(
         pageSource = { offset, lastPage ->
             repository
                 .loadPage(last = lastPage?.lastItem)
@@ -24,31 +24,32 @@ class PagingPm(repository: ItemsRepository) : BasePresentationModel() {
         }
     )
 
-    val content = stateOf(loader.contentChanges())
+    val content = stateOf(paging.contentChanges())
 
-    val isLoading = stateOf(loader.isLoading())
-    val isRefreshing = stateOf(loader.isRefreshing())
+    val isLoading = stateOf(paging.isLoading())
+    val isRefreshing = stateOf(paging.isRefreshing())
+    val refreshEnabled = stateOf(paging.refreshEnabled())
 
-    val contentViewVisible = stateOf(loader.contentVisible())
-    val emptyViewVisible = stateOf(loader.emptyVisible())
-    val errorViewVisible = stateOf(loader.errorVisible())
+    val contentViewVisible = stateOf(paging.contentVisible())
+    val emptyViewVisible = stateOf(paging.emptyVisible())
+    val errorViewVisible = stateOf(paging.errorVisible())
 
-    val pageIsLoading = stateOf(loader.pageIsLoading())
-    val pageErrorVisible = stateOf(loader.pagingErrorVisible())
+    val pageIsLoading = stateOf(paging.pageIsLoading())
+    val pageErrorVisible = stateOf(paging.pagingErrorVisible())
 
-    val refreshAction = actionTo<Unit, Paging.Action>(loader.actions) {
+    val refreshAction = actionTo<Unit, Paging.Action>(paging.actions) {
         startWith(Unit).map { Paging.Action.REFRESH }
     }
 
-    val retryAction = actionTo<Unit, Paging.Action>(loader.actions) {
+    val retryAction = actionTo<Unit, Paging.Action>(paging.actions) {
         map { Paging.Action.REFRESH }
     }
 
-    val nextPageAction = actionTo<Unit, Paging.Action>(loader.actions) {
+    val nextPageAction = actionTo<Unit, Paging.Action>(paging.actions) {
         map { Paging.Action.LOAD_NEXT_PAGE }
     }
 
-    val retryNextPageAction = actionTo<Unit, Paging.Action>(loader.actions) {
+    val retryNextPageAction = actionTo<Unit, Paging.Action>(paging.actions) {
         map { Paging.Action.LOAD_NEXT_PAGE }
     }
 
@@ -58,7 +59,7 @@ class PagingPm(repository: ItemsRepository) : BasePresentationModel() {
     override fun onCreate() {
         super.onCreate()
 
-        loader.errorChanges()
+        paging.errorChanges()
             .subscribe {
                 if (content.valueOrNull.isNullOrEmpty().not()) {
                     showError.consumer.accept("Refreshing Error")
@@ -66,7 +67,7 @@ class PagingPm(repository: ItemsRepository) : BasePresentationModel() {
             }
             .untilDestroy()
 
-        loader.scrollToTop()
+        paging.scrollToTop()
             .subscribe(scrollToTop.consumer)
             .untilDestroy()
     }

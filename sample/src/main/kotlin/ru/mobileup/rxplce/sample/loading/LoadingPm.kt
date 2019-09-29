@@ -3,7 +3,13 @@ package ru.mobileup.rxplce.sample.loading
 import ru.mobileup.rxplce.*
 import ru.mobileup.rxplce.sample.BasePresentationModel
 
-class LoadingPm(repository: DataRepository) : BasePresentationModel(){
+class LoadingPm(repository: DataRepository) : BasePresentationModel() {
+
+    data class ContentString(val text: String) : Emptyable {
+        override fun isEmpty(): Boolean {
+            return text.isEmpty()
+        }
+    }
 
     private val loader = LoadingOrdinary<ContentString>(
         source = repository.loadData().map { ContentString(it) }
@@ -18,13 +24,7 @@ class LoadingPm(repository: DataRepository) : BasePresentationModel(){
     val errorViewVisible = stateOf(loader.errorVisible())
 
     val retryAction = actionTo<Unit, Loading.Action>(loader.actions) {
-        map { Loading.Action.REFRESH }
-    }
-
-    data class ContentString(val text: String) : Emptyable {
-        override fun isEmpty(): Boolean {
-            return text.isEmpty()
-        }
+        startWith(Unit).map { Loading.Action.REFRESH }
     }
 }
 
