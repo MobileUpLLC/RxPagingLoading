@@ -61,37 +61,4 @@ interface Paging<T> {
         val lastItem: T? get() = items.lastOrNull()
         val isEndReached: Boolean
     }
-
-    fun contentChanges(): Observable<List<T>> {
-        return state
-            .filter { it.content != null }
-            .map { it.content!! }
-            .distinctUntilChanged { l1, l2 -> l1 === l2 }
-    }
-
-    fun loadingChanges(): Observable<Boolean> {
-        return state
-            .map { it.loading }
-            .distinctUntilChanged()
-    }
-
-    fun pageLoadingChanges(): Observable<Boolean> {
-        return state
-            .map { it.pageLoading }
-            .distinctUntilChanged()
-    }
-
-    fun errorChanges(): Observable<Throwable> {
-        return state
-            .filter { it.error != null }
-            .map { it.error!! }
-            .distinctUntilChanged()
-    }
-
-    fun pagingErrorChanges(): Observable<Throwable> {
-        return state
-            .filter { it.pagingError != null }
-            .map { it.pagingError!! }
-            .distinctUntilChanged()
-    }
 }

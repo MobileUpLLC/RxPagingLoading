@@ -1,50 +1,73 @@
 package ru.mobileup.rxplce.sample.paging
 
-import me.dmdev.rxpm.PresentationModel
-import me.dmdev.rxpm.command
-import ru.mobileup.rxplce.Paging
-import ru.mobileup.rxplce.PagingImpl
-import ru.mobileup.rxplce.pm.PagingPm
-import ru.mobileup.rxplce.pm.PagingPmImpl
+import me.dmdev.rxpm.*
+import ru.mobileup.rxplce.*
+import ru.mobileup.rxplce.sample.BasePresentationModel
 
-class PagingSamplePm private constructor(
-    private val pagingPm: PagingPmImpl<Item>
-) : PresentationModel(), PagingPm<Item> by pagingPm {
+class PagingSamplePm(repository: ItemsRepository) : BasePresentationModel() {
 
     class PageInfo(
         override val items: List<Item>,
         override val isEndReached: Boolean
     ) : Paging.Page<Item>
 
-    companion object {
-        fun createInstance(repository: ItemsRepository): PagingSamplePm {
-            return PagingSamplePm(
-                PagingPmImpl(
-                    PagingImpl(
-                        pageSource = { offset, lastPage ->
-                            repository
-                                .loadPage(last = lastPage?.lastItem)
-                                .map {
-                                    PageInfo(
-                                        items = it.list,
-                                        isEndReached = (offset + it.list.size) == it.totalCount
-                                    )
-                                }
-                        }
+    private val loader = PagingImpl<Item>(
+        pageSource = { offset, lastPage ->
+            repository
+                .loadPage(last = lastPage?.lastItem)
+                .map {
+                    PageInfo(
+                        items = it.list,
+                        isEndReached = (offset + it.list.size) == it.totalCount
                     )
-                )
-            )
+                }
         }
+    )
+
+    val content = stateOf(loader.contentChanges())
+
+    val isLoading = stateOf(loader.isLoading())
+    val isRefreshing = stateOf(loader.isRefreshing())
+
+    val contentViewVisible = stateOf(loader.contentVisible())
+    val emptyViewVisible = stateOf(loader.emptyVisible())
+    val errorViewVisible = stateOf(loader.errorVisible())
+
+    val pageIsLoading = stateOf(loader.pageIsLoading())
+    val pageErrorVisible = stateOf(loader.pagingErrorVisible())
+
+    val refreshAction = actionTo<Unit, Paging.Action>(loader.actions) {
+        startWith(Unit).map { Paging.Action.REFRESH }
     }
 
+    val retryAction = actionTo<Unit, Paging.Action>(loader.actions) {
+        map { Paging.Action.REFRESH }
+    }
+
+    val nextPageAction = actionTo<Unit, Paging.Action>(loader.actions) {
+        map { Paging.Action.LOAD_NEXT_PAGE }
+    }
+
+    val retryNextPageAction = actionTo<Unit, Paging.Action>(loader.actions) {
+        map { Paging.Action.LOAD_NEXT_PAGE }
+    }
+
+    val scrollToTop = command<Unit>()
     val showError = command<String>()
 
     override fun onCreate() {
         super.onCreate()
-        pagingPm.attachToParent(this)
 
-        pagingPm.errorNoticeObservable
-            .subscribe { showError.consumer.accept("Refreshing Error") }
+        loader.errorChanges()
+            .subscribe {
+                if (content.valueOrNull.isNullOrEmpty().not()) {
+                    showError.consumer.accept("Refreshing Error")
+                }
+            }
+            .untilDestroy()
+
+        loader.scrollToTop()
+            .subscribe(scrollToTop.consumer)
             .untilDestroy()
     }
 }

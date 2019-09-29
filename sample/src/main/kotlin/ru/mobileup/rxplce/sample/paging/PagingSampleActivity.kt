@@ -53,7 +53,7 @@ class PagingSampleActivity : PmActivity<PagingSamplePm>() {
     }
 
     override fun providePresentationModel(): PagingSamplePm {
-        return PagingSamplePm.createInstance(itemsRepository)
+        return PagingSamplePm(itemsRepository)
     }
 
     override fun onBindPresentationModel(pm: PagingSamplePm) {
@@ -67,7 +67,6 @@ class PagingSampleActivity : PmActivity<PagingSamplePm>() {
         pm.pageErrorVisible bindTo itemsAdapter.footerView.retryButton.visibility()
 
         pm.isLoading bindTo progressBar.visibility()
-        pm.refreshEnabled bindTo swipeRefreshLayout::setEnabled
         pm.isRefreshing bindTo swipeRefreshLayout::setRefreshing
 
         pm.contentViewVisible bindTo recyclerView.visibility()
