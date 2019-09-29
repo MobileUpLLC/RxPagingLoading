@@ -20,9 +20,9 @@ class LoadingSamplePm(
 
     override val refreshEnabled = stateOf(loader.refreshEnabled())
 
-    override val contentViewVisible = stateOf(loader.contentViewVisible())
-    override val emptyViewVisible = stateOf(loader.emptyViewVisible())
-    override val errorViewVisible = stateOf(loader.errorViewVisible())
+    override val contentViewVisible = stateOf(loader.contentVisible())
+    override val emptyViewVisible = stateOf(loader.emptyVisible())
+    override val errorViewVisible = stateOf(loader.errorVisible())
 
     override val refreshAction = actionTo<Unit, Loading.Action>(loader.actions) {
         startWith(Unit).map { Loading.Action.REFRESH }
