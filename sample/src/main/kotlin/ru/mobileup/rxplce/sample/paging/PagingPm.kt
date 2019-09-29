@@ -1,10 +1,10 @@
 package ru.mobileup.rxplce.sample.paging
 
-import me.dmdev.rxpm.*
+import me.dmdev.rxpm.command
 import ru.mobileup.rxplce.*
 import ru.mobileup.rxplce.sample.BasePresentationModel
 
-class PagingSamplePm(repository: ItemsRepository) : BasePresentationModel() {
+class PagingPm(repository: ItemsRepository) : BasePresentationModel() {
 
     class PageInfo(
         override val items: List<Item>,

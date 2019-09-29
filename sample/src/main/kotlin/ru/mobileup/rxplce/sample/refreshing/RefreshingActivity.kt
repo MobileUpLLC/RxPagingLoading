@@ -18,7 +18,7 @@ import me.dmdev.rxpm.bindTo
 import me.dmdev.rxpm.widget.bindTo
 import ru.mobileup.rxplce.sample.R
 
-class RefreshingSampleActivity : PmActivity<RefreshingSamplePm>() {
+class RefreshingActivity : PmActivity<RefreshingPm>() {
 
     val randomNumbersRepository = RandomNumbersRepository()
 
@@ -35,11 +35,11 @@ class RefreshingSampleActivity : PmActivity<RefreshingSamplePm>() {
         setupSettings()
     }
 
-    override fun providePresentationModel(): RefreshingSamplePm {
-        return RefreshingSamplePm(randomNumbersRepository)
+    override fun providePresentationModel(): RefreshingPm {
+        return RefreshingPm(randomNumbersRepository)
     }
 
-    override fun onBindPresentationModel(pm: RefreshingSamplePm) {
+    override fun onBindPresentationModel(pm: RefreshingPm) {
 
         pm.content bindTo {
             val sb = StringBuilder("Random numbers:\n\n")

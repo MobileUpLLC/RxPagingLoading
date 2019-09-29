@@ -4,7 +4,7 @@ import me.dmdev.rxpm.widget.dialogControl
 import ru.mobileup.rxplce.*
 import ru.mobileup.rxplce.sample.BasePresentationModel
 
-class RefreshingSamplePm(repository: RandomNumbersRepository) : BasePresentationModel() {
+class RefreshingPm(repository: RandomNumbersRepository) : BasePresentationModel() {
 
     private val loader = LoadingAssembled(
         refresh = repository.refreshNumbers(),

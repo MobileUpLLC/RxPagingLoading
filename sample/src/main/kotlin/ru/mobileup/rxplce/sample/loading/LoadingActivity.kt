@@ -11,18 +11,18 @@ import me.dmdev.rxpm.base.PmActivity
 import me.dmdev.rxpm.bindTo
 import ru.mobileup.rxplce.sample.R
 
-class LoadingSampleActivity : PmActivity<LoadingSamplePm>() {
+class LoadingActivity : PmActivity<LoadingPm>() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_loading)
     }
 
-    override fun providePresentationModel(): LoadingSamplePm {
-        return LoadingSamplePm(DataRepository())
+    override fun providePresentationModel(): LoadingPm {
+        return LoadingPm(DataRepository())
     }
 
-    override fun onBindPresentationModel(pm: LoadingSamplePm) {
+    override fun onBindPresentationModel(pm: LoadingPm) {
 
         pm.content bindTo { contentView.text = it.text }
 

@@ -21,7 +21,7 @@ import me.dmdev.rxpm.base.PmActivity
 import me.dmdev.rxpm.bindTo
 import ru.mobileup.rxplce.sample.R
 
-class PagingSampleActivity : PmActivity<PagingSamplePm>() {
+class PagingActivity : PmActivity<PagingPm>() {
 
     private val itemsRepository = ItemsRepository()
 
@@ -52,11 +52,11 @@ class PagingSampleActivity : PmActivity<PagingSamplePm>() {
         setupSettings()
     }
 
-    override fun providePresentationModel(): PagingSamplePm {
-        return PagingSamplePm(itemsRepository)
+    override fun providePresentationModel(): PagingPm {
+        return PagingPm(itemsRepository)
     }
 
-    override fun onBindPresentationModel(pm: PagingSamplePm) {
+    override fun onBindPresentationModel(pm: PagingPm) {
 
         pm.content bindTo { itemsAdapter.submitList(it) }
 

@@ -24,13 +24,13 @@
         </activity>
 
         <activity
-            android:name="ru.mobileup.rxplce.sample.paging.PagingSampleActivity"
+            android:name="ru.mobileup.rxplce.sample.paging.PagingActivity"
             android:label="@string/label_paging"/>
         <activity
-            android:name="ru.mobileup.rxplce.sample.loading.LoadingSampleActivity"
+            android:name="ru.mobileup.rxplce.sample.loading.LoadingActivity"
             android:label="@string/label_loading"/>
         <activity
-            android:name="ru.mobileup.rxplce.sample.refreshing.RefreshingSampleActivity"
+            android:name="ru.mobileup.rxplce.sample.refreshing.RefreshingActivity"
             android:label="@string/label_refreshing"/>
 
     </application>

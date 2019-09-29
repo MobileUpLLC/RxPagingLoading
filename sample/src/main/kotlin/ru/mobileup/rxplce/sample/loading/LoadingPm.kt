@@ -3,7 +3,7 @@ package ru.mobileup.rxplce.sample.loading
 import ru.mobileup.rxplce.*
 import ru.mobileup.rxplce.sample.BasePresentationModel
 
-class LoadingSamplePm(repository: DataRepository) : BasePresentationModel(){
+class LoadingPm(repository: DataRepository) : BasePresentationModel(){
 
     private val loader = LoadingOrdinary<ContentString>(
         source = repository.loadData().map { ContentString(it) }
