@@ -548,4 +548,187 @@ class PagingPmImplTest {
             )
         )
     }
+
+    @Test fun forceRefresh() {
+
+        val paging = PagingImpl<Int>(pageSource = { offset, _ ->
+            Single.just(getPage(offset, false))
+        })
+
+        val testObserver = paging.state.test()
+
+        paging.actions.accept(Paging.Action.REFRESH)
+        paging.actions.accept(Paging.Action.FORCE_REFRESH)
+
+        testObserver.assertValues(
+            State(
+                content = null,
+                error = null,
+                pagingError = null,
+                loading = false,
+                pageLoading = false,
+                lastPage = null
+            ),
+
+            State(
+                content = null,
+                error = null,
+                pagingError = null,
+                loading = true,
+                pageLoading = false,
+                lastPage = null
+            ),
+
+            State(
+                content = listOf(1, 2, 3),
+                error = null,
+                pagingError = null,
+                loading = false,
+                pageLoading = false,
+                lastPage = DataPage(listOf(1, 2, 3), false)
+            ),
+
+            State(
+                content = null,
+                error = null,
+                pagingError = null,
+                loading = true,
+                pageLoading = false,
+                lastPage = null
+            ),
+
+            State(
+                content = listOf(1, 2, 3),
+                error = null,
+                pagingError = null,
+                loading = false,
+                pageLoading = false,
+                lastPage = DataPage(listOf(1, 2, 3), false)
+            )
+        )
+    }
+
+    @Test fun forceRefreshOnLoading() {
+
+        val paging = PagingImpl<Int>(pageSource = { offset, _ ->
+            Single
+                .just(getPage(offset, false))
+                .delay(3, TimeUnit.SECONDS)
+        })
+
+        val testObserver = paging.state.test()
+
+        paging.actions.accept(Paging.Action.REFRESH)
+
+        schedulers.testScheduler.advanceTimeTo(1, TimeUnit.SECONDS)
+
+        paging.actions.accept(Paging.Action.FORCE_REFRESH)
+
+        schedulers.testScheduler.advanceTimeTo(4, TimeUnit.SECONDS)
+
+        testObserver.assertValues(
+            State(
+                content = null,
+                error = null,
+                pagingError = null,
+                loading = false,
+                pageLoading = false,
+                lastPage = null
+            ),
+
+            State(
+                content = null,
+                error = null,
+                pagingError = null,
+                loading = true,
+                pageLoading = false,
+                lastPage = null
+            ),
+
+            State(
+                content = listOf(1, 2, 3),
+                error = null,
+                pagingError = null,
+                loading = false,
+                pageLoading = false,
+                lastPage = DataPage(listOf(1, 2, 3), false)
+            )
+        )
+    }
+
+    @Test fun interruptPagingByForcedRefresh() {
+
+        val paging = PagingImpl<Int>(pageSource = { offset, _ ->
+            Single
+                .just(getPage(offset, false))
+                .delay(1, TimeUnit.SECONDS)
+        })
+
+        val testObserver = paging.state.test()
+
+        paging.actions.accept(Paging.Action.REFRESH)
+
+        schedulers.testScheduler.advanceTimeTo(2, TimeUnit.SECONDS)
+
+        paging.actions.accept(Paging.Action.LOAD_NEXT_PAGE)
+        paging.actions.accept(Paging.Action.FORCE_REFRESH)
+
+        schedulers.testScheduler.advanceTimeTo(4, TimeUnit.SECONDS)
+
+        testObserver.assertValues(
+            State(
+                content = null,
+                error = null,
+                pagingError = null,
+                loading = false,
+                pageLoading = false,
+                lastPage = null
+            ),
+
+            State(
+                content = null,
+                error = null,
+                pagingError = null,
+                loading = true,
+                pageLoading = false,
+                lastPage = null
+            ),
+
+            State(
+                content = listOf(1, 2, 3),
+                error = null,
+                pagingError = null,
+                loading = false,
+                pageLoading = false,
+                lastPage = DataPage(listOf(1, 2, 3), false)
+            ),
+
+            State(
+                content = listOf(1, 2, 3),
+                error = null,
+                pagingError = null,
+                loading = false,
+                pageLoading = true,
+                lastPage = DataPage(listOf(1, 2, 3), false)
+            ),
+
+            State(
+                content = null,
+                error = null,
+                pagingError = null,
+                loading = true,
+                pageLoading = false,
+                lastPage = null
+            ),
+
+            State(
+                content = listOf(1, 2, 3),
+                error = null,
+                pagingError = null,
+                loading = false,
+                pageLoading = false,
+                lastPage = DataPage(listOf(1, 2, 3), false)
+            )
+        )
+    }
 }
