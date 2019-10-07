@@ -8,6 +8,8 @@ import io.reactivex.functions.Consumer
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import ru.mobileup.rxplce.Paging.*
+import ru.mobileup.rxplce.Paging.Action.*
+import ru.mobileup.rxplce.PagingImpl.InternalAction.*
 
 /**
  * This class implements data [loading and paging][Paging].
@@ -35,55 +37,67 @@ class PagingImpl<T>(
             )
             .filter { (action, state) ->
                 when (action) {
-                    Action.LOAD_NEXT_PAGE -> {
+                    LOAD_NEXT_PAGE -> {
                         state.loading.not()
                                 && state.pageLoading.not()
                                 && state.isEndReached.not()
                     }
-                    Action.REFRESH -> state.loading.not()
-                    Action.FORCE_REFRESH -> true
+                    REFRESH -> state.loading.not()
+                    FORCE_REFRESH -> true
                 }
             }
             .switchMap { (action, state) ->
 
                 when (action) {
-                    Action.FORCE_REFRESH,
-                    Action.REFRESH -> {
+                    REFRESH,
+                    FORCE_REFRESH -> {
                         pageSource(0, null)
                             .toObservable()
-                            .map<InternalAction> { InternalAction.RefreshSuccess(it) }
-                            .startWith(InternalAction.RefreshStart)
-                            .onErrorReturn { InternalAction.RefreshFail(it) }
+                            .map<InternalAction> { RefreshSuccess(it) }
+                            .startWith(RefreshStart(force = action == FORCE_REFRESH))
+                            .onErrorReturn { RefreshFail(it) }
                     }
 
-                    Action.LOAD_NEXT_PAGE -> {
+                    LOAD_NEXT_PAGE -> {
                         pageSource(state.content?.size ?: 0, state.lastPage)
                             .toObservable()
                             .map<InternalAction> {
-                                InternalAction.PageLoadingSuccess(it)
+                                PageLoadingSuccess(it)
                             }
-                            .startWith(InternalAction.PageLoadingStart)
-                            .onErrorReturn { InternalAction.PageLoadingFail(it) }
+                            .startWith(PageLoadingStart)
+                            .onErrorReturn { PageLoadingFail(it) }
                     }
                 }
             }
             .observeOn(AndroidSchedulers.mainThread())
             .scan(State<T>()) { state, action ->
                 when (action) {
-                    InternalAction.RefreshStart -> {
-                        state.copy(
-                            loading = true,
-                            pageLoading = false,
-                            error = null
-                        )
+                    is RefreshStart -> {
+                        if (action.force) {
+                            state.copy(
+                                content = null,
+                                loading = true,
+                                pageLoading = false,
+                                error = null,
+                                pagingError = null,
+                                lastPage = null
+                            )
+                        } else {
+                            state.copy(
+                                loading = true,
+                                pageLoading = false,
+                                error = null,
+                                pagingError = null
+                            )
+                        }
                     }
-                    is InternalAction.RefreshFail -> {
+                    is RefreshFail -> {
                         state.copy(
                             loading = false,
                             error = action.error
                         )
                     }
-                    is InternalAction.RefreshSuccess<*> -> {
+                    is RefreshSuccess<*> -> {
 
                         @Suppress("UNCHECKED_CAST")
                         val page = action.page as Page<T>
@@ -93,19 +107,19 @@ class PagingImpl<T>(
                             lastPage = page
                         )
                     }
-                    InternalAction.PageLoadingStart -> {
+                    PageLoadingStart -> {
                         state.copy(
                             pageLoading = true,
                             pagingError = null
                         )
                     }
-                    is InternalAction.PageLoadingFail -> {
+                    is PageLoadingFail -> {
                         state.copy(
                             pageLoading = false,
                             pagingError = action.error
                         )
                     }
-                    is InternalAction.PageLoadingSuccess<*> -> {
+                    is PageLoadingSuccess<*> -> {
                         @Suppress("UNCHECKED_CAST")
                         val page = action.page as Page<T>
 
@@ -117,13 +131,21 @@ class PagingImpl<T>(
                     }
                 }
             }
+            .distinctUntilChanged { s1, s2 ->
+                s1.content === s2.content
+                        && s1.loading == s2.loading
+                        && s1.error === s2.error
+                        && s1.pageLoading == s2.pageLoading
+                        && s1.pagingError === s2.pagingError
+                        && s1.lastPage === s2.lastPage
+            }
             .doOnNext { stateSubject.onNext(it) }
             .share()
 
     }
 
     private sealed class InternalAction {
-        object RefreshStart : InternalAction()
+        class RefreshStart(val force: Boolean) : InternalAction()
         class RefreshSuccess<T>(val page: Page<T>) : InternalAction()
         class RefreshFail(val error: Throwable) : InternalAction()
         object PageLoadingStart : InternalAction()

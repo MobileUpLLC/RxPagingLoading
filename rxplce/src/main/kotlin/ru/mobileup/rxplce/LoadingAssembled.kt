@@ -8,7 +8,10 @@ import io.reactivex.functions.Consumer
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import ru.mobileup.rxplce.Loading.Action
+import ru.mobileup.rxplce.Loading.Action.FORCE_REFRESH
+import ru.mobileup.rxplce.Loading.Action.REFRESH
 import ru.mobileup.rxplce.Loading.State
+import ru.mobileup.rxplce.LoadingAssembled.InternalAction.*
 
 /**
  * The data loader [implementation][Loading].
@@ -37,42 +40,50 @@ class LoadingAssembled<T>(
             )
             .filter { (action, state) ->
                 when (action) {
-                    Action.REFRESH -> state.loading.not()
-                    Action.FORCE_REFRESH -> true
+                    REFRESH -> state.loading.not()
+                    FORCE_REFRESH -> true
                 }
             }
-            .switchMap {
+            .switchMap { (action, _) ->
                 refresh
                     .toSingleDefault(Unit)
                     .toObservable()
-                    .map<InternalAction> { InternalAction.RefreshSuccess }
-                    .startWith(InternalAction.RefreshStart)
-                    .onErrorReturn { InternalAction.RefreshFail(it) }
+                    .map<InternalAction> { RefreshSuccess }
+                    .startWith(RefreshStart(force = action == FORCE_REFRESH))
+                    .onErrorReturn { RefreshFail(it) }
             }
             .mergeWith(
-                updates.map { InternalAction.UpdateData(it) }
+                updates.map { UpdateData(it) }
             )
             .observeOn(AndroidSchedulers.mainThread())
             .scan(State<T>()) { state, action ->
                 when (action) {
-                    is InternalAction.RefreshStart -> {
-                        state.copy(
-                            loading = true,
-                            error = null
-                        )
+                    is RefreshStart -> {
+                        if (action.force) {
+                            state.copy(
+                                content = null,
+                                loading = true,
+                                error = null
+                            )
+                        } else {
+                            state.copy(
+                                loading = true,
+                                error = null
+                            )
+                        }
                     }
-                    is InternalAction.RefreshSuccess -> {
+                    is RefreshSuccess -> {
                         state.copy(
                             loading = false
                         )
                     }
-                    is InternalAction.RefreshFail -> {
+                    is RefreshFail -> {
                         state.copy(
                             loading = false,
                             error = action.error
                         )
                     }
-                    is InternalAction.UpdateData<*> -> {
+                    is UpdateData<*> -> {
                         @Suppress("UNCHECKED_CAST")
                         state.copy(
                             content = action.data as T
@@ -80,12 +91,13 @@ class LoadingAssembled<T>(
                     }
                 }
             }
+            .distinctUntilChanged()
             .doOnNext { stateSubject.onNext(it) }
             .share()
     }
 
     private sealed class InternalAction {
-        object RefreshStart : InternalAction()
+        class RefreshStart(val force: Boolean) : InternalAction()
         class RefreshFail(val error: Throwable) : InternalAction()
         object RefreshSuccess : InternalAction()
         class UpdateData<T>(val data: T) : InternalAction()

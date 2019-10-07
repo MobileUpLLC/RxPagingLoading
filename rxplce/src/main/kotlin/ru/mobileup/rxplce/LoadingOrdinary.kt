@@ -8,7 +8,10 @@ import io.reactivex.functions.Consumer
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import ru.mobileup.rxplce.Loading.Action
+import ru.mobileup.rxplce.Loading.Action.FORCE_REFRESH
+import ru.mobileup.rxplce.Loading.Action.REFRESH
 import ru.mobileup.rxplce.Loading.State
+import ru.mobileup.rxplce.LoadingOrdinary.InternalAction.*
 
 /**
  * Simple data loader [implementation][Loading].
@@ -34,34 +37,35 @@ class LoadingOrdinary<T>(
             )
             .filter { (action, state) ->
                 when (action) {
-                    Action.REFRESH -> state.loading.not()
-                    Action.FORCE_REFRESH -> true
+                    REFRESH -> state.loading.not()
+                    FORCE_REFRESH -> true
                 }
             }
-            .switchMap {
+            .switchMap { (action, _) ->
                 source
                     .toObservable()
-                    .map<InternalAction> { InternalAction.LoadSuccess(it) }
-                    .startWith(InternalAction.LoadStart)
-                    .onErrorReturn { InternalAction.LoadFail(it) }
+                    .map<InternalAction> { LoadSuccess(it) }
+                    .startWith(LoadStart(force = action == FORCE_REFRESH))
+                    .onErrorReturn { LoadFail(it) }
             }
             .observeOn(AndroidSchedulers.mainThread())
             .scan(State<T>()) { state, action ->
                 when (action) {
-                    is InternalAction.LoadStart -> {
+                    is LoadStart -> {
                         state.copy(
+                            content = if (action.force) null else state.content,
                             loading = true,
                             error = null
                         )
                     }
-                    is InternalAction.LoadSuccess<*> -> {
+                    is LoadSuccess<*> -> {
                         @Suppress("UNCHECKED_CAST")
                         state.copy(
                             loading = false,
                             content = action.data as T
                         )
                     }
-                    is InternalAction.LoadFail -> {
+                    is LoadFail -> {
                         state.copy(
                             loading = false,
                             error = action.error
@@ -69,12 +73,13 @@ class LoadingOrdinary<T>(
                     }
                 }
             }
+            .distinctUntilChanged()
             .doOnNext { stateSubject.onNext(it) }
             .share()
     }
 
     private sealed class InternalAction {
-        object LoadStart : InternalAction()
+        class LoadStart(val force: Boolean) : InternalAction()
         class LoadSuccess<T>(val data: T) : InternalAction()
         class LoadFail(val error: Throwable) : InternalAction()
     }
