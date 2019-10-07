@@ -33,9 +33,14 @@ class LoadingAssembled<T>(
         state = actionSubject
             .withLatestFrom(
                 stateSubject,
-                BiFunction { _: Action, state: State<T> -> state }
+                BiFunction { action: Action, state: State<T> -> action to state }
             )
-            .filter { !it.loading }
+            .filter { (action, state) ->
+                when (action) {
+                    Action.REFRESH -> state.loading.not()
+                    Action.FORCE_REFRESH -> true
+                }
+            }
             .switchMap {
                 refresh
                     .toSingleDefault(Unit)

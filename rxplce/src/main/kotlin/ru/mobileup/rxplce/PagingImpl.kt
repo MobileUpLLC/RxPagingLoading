@@ -7,8 +7,7 @@ import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Consumer
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
-import ru.mobileup.rxplce.Paging.Page
-import ru.mobileup.rxplce.Paging.State
+import ru.mobileup.rxplce.Paging.*
 
 /**
  * This class implements data [loading and paging][Paging].
@@ -20,34 +19,36 @@ class PagingImpl<T>(
 ) : Paging<T> {
 
     private val stateSubject = BehaviorSubject.createDefault<State<T>>(State()).toSerialized()
-    private val actionSubject = PublishSubject.create<Paging.Action>().toSerialized()
+    private val actionSubject = PublishSubject.create<Action>().toSerialized()
 
     override val state: Observable<State<T>>
-    override val actions: Consumer<Paging.Action> = Consumer { actionSubject.onNext(it) }
+    override val actions: Consumer<Action> = Consumer { actionSubject.onNext(it) }
 
     init {
 
         state = actionSubject
             .withLatestFrom(
                 stateSubject,
-                BiFunction { action: Paging.Action, state: State<T> ->
+                BiFunction { action: Action, state: State<T> ->
                     action to state
                 }
             )
             .filter { (action, state) ->
                 when (action) {
-                    Paging.Action.LOAD_NEXT_PAGE -> {
+                    Action.LOAD_NEXT_PAGE -> {
                         state.loading.not()
                                 && state.pageLoading.not()
                                 && state.isEndReached.not()
                     }
-                    Paging.Action.REFRESH -> state.loading.not()
+                    Action.REFRESH -> state.loading.not()
+                    Action.FORCE_REFRESH -> true
                 }
             }
             .switchMap { (action, state) ->
 
                 when (action) {
-                    Paging.Action.REFRESH -> {
+                    Action.FORCE_REFRESH,
+                    Action.REFRESH -> {
                         pageSource(0, null)
                             .toObservable()
                             .map<InternalAction> { InternalAction.RefreshSuccess(it) }
@@ -55,7 +56,7 @@ class PagingImpl<T>(
                             .onErrorReturn { InternalAction.RefreshFail(it) }
                     }
 
-                    Paging.Action.LOAD_NEXT_PAGE -> {
+                    Action.LOAD_NEXT_PAGE -> {
                         pageSource(state.content?.size ?: 0, state.lastPage)
                             .toObservable()
                             .map<InternalAction> {

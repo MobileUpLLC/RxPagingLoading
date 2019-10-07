@@ -16,7 +16,7 @@ interface Loading<T> {
     /**
      * UI-events or intentions to change a state of data.
      */
-    enum class Action { REFRESH }
+    enum class Action { REFRESH, FORCE_REFRESH }
 
     /**
      * The observer of changing [state][State].

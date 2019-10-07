@@ -15,7 +15,7 @@ interface Paging<T> {
     /**
      * UI-events or intentions to change a state of data.
      */
-    enum class Action { REFRESH, LOAD_NEXT_PAGE }
+    enum class Action { REFRESH, FORCE_REFRESH, LOAD_NEXT_PAGE }
 
     /**
      * The observer of changing [state][State].
