@@ -25,7 +25,7 @@ class LoadingAssembled<T>(
     updates: Observable<T>
 ) : Loading<T> {
 
-    private val stateSubject = BehaviorSubject.createDefault<State<T>>(State()).toSerialized()
+    private val stateSubject = BehaviorSubject.create<State<T>>().toSerialized()
     private val actionSubject = PublishSubject.create<Action>().toSerialized()
 
     override val state: Observable<State<T>>
@@ -93,7 +93,8 @@ class LoadingAssembled<T>(
             }
             .distinctUntilChanged()
             .doOnNext { stateSubject.onNext(it) }
-            .share()
+            .replay(1)
+            .refCount()
     }
 
     private sealed class InternalAction {

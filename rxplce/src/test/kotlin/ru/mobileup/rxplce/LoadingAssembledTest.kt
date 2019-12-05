@@ -37,6 +37,37 @@ class LoadingAssembledTest {
         )
     }
 
+    @Test fun multicast() {
+
+        val relay = BehaviorRelay.create<String>()
+        val loading = LoadingAssembled(
+            refresh = Completable.create {
+                relay.accept("foo")
+                it.onComplete()
+            },
+            updates = relay
+        )
+
+        val testObserver = loading.state.test()
+        val testObserver2 = loading.state.test()
+
+        testObserver.assertValues(
+            Loading.State(
+                content = null,
+                error = null,
+                loading = false
+            )
+        )
+
+        testObserver2.assertValues(
+            Loading.State(
+                content = null,
+                error = null,
+                loading = false
+            )
+        )
+    }
+
     @Test fun refreshingSuccess() {
 
         val relay = BehaviorRelay.create<String>()

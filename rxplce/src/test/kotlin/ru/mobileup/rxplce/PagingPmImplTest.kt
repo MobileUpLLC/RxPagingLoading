@@ -49,6 +49,38 @@ class PagingPmImplTest {
         )
     }
 
+    @Test fun multicast() {
+
+        val paging = PagingImpl<Int>(pageSource = { offset, _ ->
+            Single.just(getPage(offset, false))
+        })
+
+        val testObserver = paging.state.test()
+        val testObserver2 = paging.state.test()
+
+        testObserver.assertValues(
+            State(
+                content = null,
+                error = null,
+                pagingError = null,
+                loading = false,
+                pageLoading = false,
+                lastPage = null
+            )
+        )
+
+        testObserver2.assertValues(
+            State(
+                content = null,
+                error = null,
+                pagingError = null,
+                loading = false,
+                pageLoading = false,
+                lastPage = null
+            )
+        )
+    }
+
     @Test fun firstLoadPage() {
 
         val paging = PagingImpl<Int>(pageSource = { offset, _ ->

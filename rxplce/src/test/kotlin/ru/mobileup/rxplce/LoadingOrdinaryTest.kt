@@ -30,6 +30,29 @@ class LoadingOrdinaryTest {
         )
     }
 
+    @Test fun multicast() {
+
+        val loading = LoadingOrdinary(source)
+        val testObserver = loading.state.test()
+        val testObserver2 = loading.state.test()
+
+        testObserver.assertValues(
+            Loading.State(
+                content = null,
+                error = null,
+                loading = false
+            )
+        )
+
+        testObserver2.assertValues(
+            Loading.State(
+                content = null,
+                error = null,
+                loading = false
+            )
+        )
+    }
+
     @Test fun loadingSuccess() {
 
         val loading = LoadingOrdinary(source)

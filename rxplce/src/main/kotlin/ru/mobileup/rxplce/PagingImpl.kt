@@ -20,7 +20,7 @@ class PagingImpl<T>(
     private val pageSource: ((offset: Int, lastPage: Page<T>?) -> Single<Page<T>>)
 ) : Paging<T> {
 
-    private val stateSubject = BehaviorSubject.createDefault<State<T>>(State()).toSerialized()
+    private val stateSubject = BehaviorSubject.create<State<T>>().toSerialized()
     private val actionSubject = PublishSubject.create<Action>().toSerialized()
 
     override val state: Observable<State<T>>
@@ -140,7 +140,8 @@ class PagingImpl<T>(
                         && s1.lastPage === s2.lastPage
             }
             .doOnNext { stateSubject.onNext(it) }
-            .share()
+            .replay(1)
+            .refCount()
 
     }
 
