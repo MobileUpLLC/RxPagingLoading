@@ -1,9 +1,11 @@
 package ru.mobileup.rxplce.sample.loading
 
+import me.dmdev.rxpm.PresentationModel
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import ru.mobileup.rxplce.*
-import ru.mobileup.rxplce.sample.BasePresentationModel
 
-class LoadingPm(repository: DataRepository) : BasePresentationModel() {
+class LoadingPm(repository: DataRepository) : PresentationModel() {
 
     data class ContentString(val text: String) : Emptyable {
         override fun isEmpty(): Boolean {
@@ -15,16 +17,18 @@ class LoadingPm(repository: DataRepository) : BasePresentationModel() {
         source = repository.loadData().map { ContentString(it) }
     )
 
-    val content = stateOf(loader.contentChanges())
+    val content = state { loader.contentChanges() }
 
-    val isLoading = stateOf(loader.isLoading())
+    val isLoading = state { loader.isLoading() }
 
-    val contentViewVisible = stateOf(loader.contentVisible())
-    val emptyViewVisible = stateOf(loader.emptyVisible())
-    val errorViewVisible = stateOf(loader.errorVisible())
+    val contentViewVisible = state { loader.contentVisible() }
+    val emptyViewVisible = state { loader.emptyVisible() }
+    val errorViewVisible = state { loader.errorVisible() }
 
-    val retryAction = actionTo<Unit, Loading.Action>(loader.actions) {
-        startWith(Unit).map { Loading.Action.REFRESH }
+    val retryAction = action<Unit> {
+        this.startWith(Unit)
+            .map { Loading.Action.REFRESH }
+            .doOnNext(loader.actions)
     }
 }
 

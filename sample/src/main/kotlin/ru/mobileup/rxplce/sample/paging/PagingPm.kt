@@ -1,10 +1,12 @@
 package ru.mobileup.rxplce.sample.paging
 
+import me.dmdev.rxpm.PresentationModel
+import me.dmdev.rxpm.action
 import me.dmdev.rxpm.command
+import me.dmdev.rxpm.state
 import ru.mobileup.rxplce.*
-import ru.mobileup.rxplce.sample.BasePresentationModel
 
-class PagingPm(repository: ItemsRepository) : BasePresentationModel() {
+class PagingPm(repository: ItemsRepository) :PresentationModel() {
 
     class PageInfo(
         override val items: List<Item>,
@@ -24,33 +26,38 @@ class PagingPm(repository: ItemsRepository) : BasePresentationModel() {
         }
     )
 
-    val content = stateOf(paging.contentChanges())
+    val content = state { paging.contentChanges() }
 
-    val isLoading = stateOf(paging.isLoading())
-    val isRefreshing = stateOf(paging.isRefreshing())
-    val refreshEnabled = stateOf(paging.refreshEnabled())
+    val isLoading = state { paging.isLoading() }
+    val isRefreshing = state { paging.isRefreshing() }
+    val refreshEnabled = state { paging.refreshEnabled() }
 
-    val contentViewVisible = stateOf(paging.contentVisible())
-    val emptyViewVisible = stateOf(paging.emptyVisible())
-    val errorViewVisible = stateOf(paging.errorVisible())
+    val contentViewVisible = state { paging.contentVisible() }
+    val emptyViewVisible = state { paging.emptyVisible() }
+    val errorViewVisible = state { paging.errorVisible() }
 
-    val pageIsLoading = stateOf(paging.pageIsLoading())
-    val pageErrorVisible = stateOf(paging.pagingErrorVisible())
+    val pageIsLoading = state { paging.pageIsLoading() }
+    val pageErrorVisible = state { paging.pagingErrorVisible() }
 
-    val refreshAction = actionTo<Unit, Paging.Action>(paging.actions) {
-        startWith(Unit).map { Paging.Action.REFRESH }
+    val refreshAction = action<Unit> {
+        this.startWith(Unit)
+            .map { Paging.Action.REFRESH }
+            .doOnNext(paging.actions)
     }
 
-    val retryAction = actionTo<Unit, Paging.Action>(paging.actions) {
-        map { Paging.Action.REFRESH }
+    val retryAction = action<Unit> {
+        this.map { Paging.Action.REFRESH }
+            .doOnNext(paging.actions)
     }
 
-    val nextPageAction = actionTo<Unit, Paging.Action>(paging.actions) {
-        map { Paging.Action.LOAD_NEXT_PAGE }
+    val nextPageAction = action<Unit> {
+        this.map { Paging.Action.LOAD_NEXT_PAGE }
+            .doOnNext(paging.actions)
     }
 
-    val retryNextPageAction = actionTo<Unit, Paging.Action>(paging.actions) {
-        map { Paging.Action.LOAD_NEXT_PAGE }
+    val retryNextPageAction = action<Unit> {
+        this.map { Paging.Action.LOAD_NEXT_PAGE }
+            .doOnNext(paging.actions)
     }
 
     val scrollToTop = command<Unit>()

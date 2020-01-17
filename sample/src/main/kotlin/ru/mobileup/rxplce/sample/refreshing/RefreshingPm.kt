@@ -1,41 +1,46 @@
 package ru.mobileup.rxplce.sample.refreshing
 
+import me.dmdev.rxpm.PresentationModel
+import me.dmdev.rxpm.action
+import me.dmdev.rxpm.state
 import me.dmdev.rxpm.widget.dialogControl
 import ru.mobileup.rxplce.*
-import ru.mobileup.rxplce.sample.BasePresentationModel
 
-class RefreshingPm(repository: RandomNumbersRepository) : BasePresentationModel() {
+class RefreshingPm(repository: RandomNumbersRepository) : PresentationModel() {
 
-    private val loader = LoadingAssembled(
+    private val loading = LoadingAssembled(
         refresh = repository.refreshNumbers(),
         updates = repository.numbersChanges()
     )
 
-    val content = stateOf(loader.contentChanges())
+    val content = state(diffStrategy = null) { loading.contentChanges() }
 
-    val isLoading = stateOf(loader.isLoading())
-    val isRefreshing = stateOf(loader.isRefreshing())
+    val isLoading = state { loading.isLoading() }
+    val isRefreshing = state { loading.isRefreshing() }
 
-    val refreshEnabled = stateOf(loader.refreshEnabled())
+    val refreshEnabled = state { loading.refreshEnabled() }
 
-    val contentViewVisible = stateOf(loader.contentVisible())
-    val emptyViewVisible = stateOf(loader.emptyVisible())
-    val errorViewVisible = stateOf(loader.errorVisible())
+    val contentViewVisible = state { loading.contentVisible() }
+    val emptyViewVisible = state { loading.emptyVisible() }
+    val errorViewVisible = state { loading.errorVisible() }
 
     val errorDialog = dialogControl<String, Unit>()
 
-    val refreshAction = actionTo<Unit, Loading.Action>(loader.actions) {
-        startWith(Unit).map { Loading.Action.REFRESH }
+    val refreshAction = action<Unit> {
+        this.startWith(Unit)
+            .map { Loading.Action.REFRESH }
+            .doOnNext(loading.actions)
     }
 
-    val retryAction = actionTo<Unit, Loading.Action>(loader.actions) {
-        map { Loading.Action.REFRESH }
+    val retryAction = action<Unit> {
+        this.map { Loading.Action.REFRESH }
+            .doOnNext(loading.actions)
     }
 
     override fun onCreate() {
         super.onCreate()
 
-        loader.errorChanges()
+        loading.errorChanges()
             .subscribe { errorDialog.show("Refreshing Error") }
             .untilDestroy()
     }
