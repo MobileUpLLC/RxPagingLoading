@@ -37,7 +37,7 @@ This class takes a data source as a Single into the constructor:
 
 ```Kotlin
 LoadingOrdinary(
-	source = Single.just("Content string")
+    source = Single.just("Content string")
 )
 ```
 
@@ -47,7 +47,7 @@ This implementation is used when there is a `Сompletable` for updating data and
 
 ```Kotlin
 LoadingAssembled(
-	refresh = repository.refreshDataCompletable(),
+    refresh = repository.refreshDataCompletable(),
     updates = repository.dataChangesObservable()
 )
 ```
@@ -91,9 +91,9 @@ Note, the `State` also stores the last loaded page. It is needed to download the
 ```Kotlin
 
 class PageInfo(
-	override val items: List<Item>,
-	override val isEndReached: Boolean
-	lastItemId: Int
+    override val items: List<Item>,
+    override val isEndReached: Boolean
+    lastItemId: Int
 ) : Paging.Page<Item>
 
 PagingImpl(
@@ -112,7 +112,7 @@ PagingImpl(
 ```
 
 ## Display the state
-We recommend converting the resulting PLCE or LCE state to the corresponding state for the screen. In the PLCE-pm module, we use the RxPM library integration to map the current state to the screen state. More details you can see in the sample.
+We recommend converting the resulting PLCE or LCE state to the corresponding state for the screen. In the PLCE-pm module, we use the RxPM library integration to map the current state to the screen state. More details you can see in the [sample](https://github.com/MobileUpLLC/RxPLCE/tree/develop/sample).
 
 ## License
 ```
