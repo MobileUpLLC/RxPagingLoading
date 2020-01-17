@@ -28,7 +28,6 @@ dependencies {
     testImplementation libraries.rxRelay
 
     implementation libraries.kotlinStdLib
-    implementation libraries.rxRelay
     implementation libraries.rxAndroid
     api libraries.rxJava
 }
