@@ -63,6 +63,7 @@ class RefreshingActivity : PmActivity<RefreshingPm>() {
 
         swipeRefreshLayout.refreshes() bindTo pm.refreshAction
         retryButton.clicks() bindTo pm.retryAction
+        forceRefreshButton.clicks() bindTo  pm.forceRefreshAction
     }
 
     private fun setupSettings() {

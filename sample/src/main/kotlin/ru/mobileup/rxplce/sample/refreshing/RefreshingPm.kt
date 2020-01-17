@@ -37,6 +37,12 @@ class RefreshingPm(repository: RandomNumbersRepository) : PresentationModel() {
             .doOnNext(loading.actions)
     }
 
+    val forceRefreshAction = action<Unit> {
+        this.startWith(Unit)
+            .map { Loading.Action.FORCE_REFRESH }
+            .doOnNext(loading.actions)
+    }
+
     override fun onCreate() {
         super.onCreate()
 

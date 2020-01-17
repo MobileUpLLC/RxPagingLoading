@@ -41,9 +41,18 @@
                 android:id="@+id/updateButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center|bottom"
-                android:layout_marginBottom="32dp"
+                android:layout_gravity="start|bottom"
+                android:layout_margin="32dp"
                 android:text="External update"
+                tools:ignore="HardcodedText"/>
+
+            <Button
+                android:id="@+id/forceRefreshButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:layout_margin="32dp"
+                android:text="Force refresh"
                 tools:ignore="HardcodedText"/>
 
         </FrameLayout>

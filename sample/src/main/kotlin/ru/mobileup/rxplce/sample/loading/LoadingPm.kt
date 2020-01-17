@@ -13,22 +13,28 @@ class LoadingPm(repository: DataRepository) : PresentationModel() {
         }
     }
 
-    private val loader = LoadingOrdinary<ContentString>(
+    private val loading = LoadingOrdinary<ContentString>(
         source = repository.loadData().map { ContentString(it) }
     )
 
-    val content = state { loader.contentChanges() }
+    val content = state { loading.contentChanges() }
 
-    val isLoading = state { loader.isLoading() }
+    val isLoading = state { loading.isLoading() }
 
-    val contentViewVisible = state { loader.contentVisible() }
-    val emptyViewVisible = state { loader.emptyVisible() }
-    val errorViewVisible = state { loader.errorVisible() }
+    val contentViewVisible = state { loading.contentVisible() }
+    val emptyViewVisible = state { loading.emptyVisible() }
+    val errorViewVisible = state { loading.errorVisible() }
 
     val retryAction = action<Unit> {
         this.startWith(Unit)
             .map { Loading.Action.REFRESH }
-            .doOnNext(loader.actions)
+            .doOnNext(loading.actions)
+    }
+
+    val forceRefreshAction = action<Unit> {
+        this.startWith(Unit)
+            .map { Loading.Action.FORCE_REFRESH }
+            .doOnNext(loading.actions)
     }
 }
 

@@ -33,5 +33,6 @@ class LoadingActivity : PmActivity<LoadingPm>() {
         pm.errorViewVisible bindTo errorView.visibility()
 
         retryButton.clicks() bindTo pm.retryAction
+        forceRefreshButton.clicks() bindTo pm.forceRefreshAction
     }
 }
