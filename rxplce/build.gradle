@@ -1,5 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
 
 android {
 
@@ -31,3 +33,34 @@ dependencies {
     implementation libraries.rxAndroid
     api libraries.rxJava
 }
+
+ext {
+
+    bintrayRepo = "RxPLCE"
+    bintrayName = "RxPLCE"
+
+    publishedGroupId = 'ru.mobileup.rxplce'
+    libraryName = 'RxPLCE'
+    artifact = 'rxplce'
+
+    libraryDescription = 'Reactive paging and loading data library'
+
+    siteUrl = 'https://github.com/MobileUpLLC/RxPLCE/'
+    gitUrl = 'https://github.com/MobileUpLLC/RxPLCE.git'
+
+    libraryVersion = '1.0.0'
+
+    developerId = 'MobileUp'
+    developerName = 'MobileUp'
+    developerEmail = 'dev@mobileup.ru'
+
+    licenseName = 'The MIT License'
+    licenseUrl = 'https://github.com/MobileUpLLC/RxPLCE/blob/develop/LICENSE'
+    allLicenses = ["MIT"]
+}
+
+//Add these lines to publish library to bintray.
+//Place it at the end of the file
+
+apply from: 'install.gradle'
+apply from: 'bintray.gradle'

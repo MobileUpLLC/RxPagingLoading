@@ -4,7 +4,10 @@ ext.versions = [
         'compileSdk'         : 29,
         'targetSdk'          : 29,
 
-        'androidgradlePlugin': '3.5.3',
+        'bintrayPlugin': '1.8.4',
+        'mavenPlugin': '1.5',
+
+        'androidGradlePlugin': '3.5.3',
         'kotlin'             : '1.3.61',
 
         'junit'              : '4.12',
@@ -40,6 +43,9 @@ ext.libraries = [
 ]
 
 ext.gradlePlugins = [
-        android: "com.android.tools.build:gradle:$versions.androidgradlePlugin",
-        kotlin : "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin",
+        bintray : "com.jfrog.bintray.gradle:gradle-bintray-plugin:$versions.bintrayPlugin",
+        maven : "com.github.dcendents:android-maven-gradle-plugin:$versions.mavenPlugin",
+
+        android: "com.android.tools.build:gradle:$versions.androidGradlePlugin",
+        kotlin : "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
 ]
