@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="ru.mobileup.rxplce.sample">
+    package="ru.mobileup.rxpagingloading.sample">
 
     <application
         android:allowBackup="true"
@@ -12,7 +12,7 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <activity
-            android:name="ru.mobileup.rxplce.sample.LaunchActivity"
+            android:name="ru.mobileup.rxpagingloading.sample.LaunchActivity"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait">
 
@@ -24,13 +24,13 @@
         </activity>
 
         <activity
-            android:name="ru.mobileup.rxplce.sample.paging.PagingActivity"
+            android:name="ru.mobileup.rxpagingloading.sample.paging.PagingActivity"
             android:label="@string/label_paging"/>
         <activity
-            android:name="ru.mobileup.rxplce.sample.loading.LoadingActivity"
+            android:name="ru.mobileup.rxpagingloading.sample.loading.LoadingActivity"
             android:label="@string/label_loading"/>
         <activity
-            android:name="ru.mobileup.rxplce.sample.refreshing.RefreshingActivity"
+            android:name="ru.mobileup.rxpagingloading.sample.refreshing.RefreshingActivity"
             android:label="@string/label_refreshing"/>
 
     </application>

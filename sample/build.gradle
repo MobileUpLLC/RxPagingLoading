@@ -11,7 +11,7 @@ android {
     compileSdkVersion versions.compileSdk
 
     defaultConfig {
-        applicationId "ru.mobileup.rxplce"
+        applicationId "ru.mobileup.rxpagingloading"
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
         versionCode 1
@@ -51,5 +51,5 @@ dependencies {
     implementation libraries.rxBinding
     implementation libraries.rxBindingSwiperefreshlayout
 
-    implementation project(path: ':rxplce')
+    implementation project(path: ':rxpagingloading')
 }
