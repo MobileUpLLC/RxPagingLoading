@@ -1,9 +1,23 @@
 # Reactive Paging and Loading
 
+[ ![Download](https://api.bintray.com/packages/1117847002272/RxPagingLoading/RxPagingLoading/images/download.svg?version=1.0.0) ](https://bintray.com/1117847002272/RxPagingLoading/RxPagingLoading/1.0.0/link)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 This library implements reactive paging and loading. 
-It helps to handle the states of loading a simple data (LCE, loading/content/error) or the complex states of lists with pagination (PLCE, paging/loading/content/error). The solution is based on the usage of Unidirectional Data Flow pattern.
+
+It helps to handle the states of loading a simple data (LCE - loading/content/error) or the complex states of lists with pagination (PLCE - paging/loading/content/error).
+
+The solution is based on the usage of Unidirectional Data Flow pattern.
 
 The library depends on RxJava, so you will find familiar interfaces in it's API.
+
+## Dependency 
+Add the dependency to your build.gradle:
+```Groovy
+dependencies {
+    implementation 'ru.mobileup:rxpagingloading:1.0.0'
+}
+```
 
 ## Loading a simple data
 
@@ -116,7 +130,7 @@ PagingImpl(
 ## Display the state
 You can just use the resulting PLCE or LCE state to render your screen UI. Or you can use extensions from `LoadingExtensions.kt` and `PagingExtensions.kt` to observe individual state parts changes. It's helpful when you don't need all of the states or use with MVVM-like pattern. 
 
-In the [sample](https://github.com/MobileUpLLC/RxPagingLoading/tree/develop/sample) we use the [RxPM](https://github.com/dmdevgo/RxPM/tree/develop/rxpm) library and extensions to split resulting state to the Presentation Model states.
+In the [sample](https://github.com/MobileUpLLC/RxPagingLoading/tree/develop/sample) we use the [RxPM](https://github.com/dmdevgo/RxPM) library and extensions to split resulting state to the Presentation Model states.
 
 ## License
 ```
