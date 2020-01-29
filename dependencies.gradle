@@ -1,0 +1,51 @@
+ext.versions = [
+
+        'minSdk'             : 21,
+        'compileSdk'         : 29,
+        'targetSdk'          : 29,
+
+        'bintrayPlugin': '1.8.4',
+        'mavenPlugin': '1.5',
+
+        'androidGradlePlugin': '3.5.3',
+        'kotlin'             : '1.3.61',
+
+        'junit'              : '4.12',
+
+        'rxJava'             : '2.2.17',
+        'rxAndroid'          : '2.1.1',
+        'rxPm'               : '2.0',
+        'rxRelay'            : '2.1.1',
+        'rxBinding'          : '3.1.0',
+
+        'appCompat'          : '1.1.0',
+        'recyclerView'       : '1.1.0',
+
+        'mockito'            : '2.2.0'
+]
+
+ext.libraries = [
+        junit                      : "junit:junit:${versions.junit}",
+        kotlinStdLib               : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}",
+
+        appCompat                  : "androidx.appcompat:appcompat:${versions.appCompat}",
+        recyclerView               : "androidx.recyclerview:recyclerview:${versions.recyclerView}",
+
+        rxJava                     : "io.reactivex.rxjava2:rxjava:${versions.rxJava}",
+        rxAndroid                  : "io.reactivex.rxjava2:rxandroid:${versions.rxAndroid}",
+        rxPm                       : "me.dmdev.rxpm:rxpm:${versions.rxPm}",
+        rxRelay                    : "com.jakewharton.rxrelay2:rxrelay:${versions.rxRelay}",
+        rxBinding                  : "com.jakewharton.rxbinding3:rxbinding:${versions.rxBinding}",
+        rxBindingSwiperefreshlayout: "com.jakewharton.rxbinding3:rxbinding-swiperefreshlayout:${versions.rxBinding}",
+
+        junitKotlin                : "org.jetbrains.kotlin:kotlin-test-junit:$versions.kotlin",
+        mockitoKotlin              : "com.nhaarman.mockitokotlin2:mockito-kotlin:$versions.mockito"
+]
+
+ext.gradlePlugins = [
+        bintray : "com.jfrog.bintray.gradle:gradle-bintray-plugin:$versions.bintrayPlugin",
+        maven : "com.github.dcendents:android-maven-gradle-plugin:$versions.mavenPlugin",
+
+        android: "com.android.tools.build:gradle:$versions.androidGradlePlugin",
+        kotlin : "org.jetbrains.kotlin:kotlin-gradle-plugin:$versions.kotlin"
+]

@@ -1,0 +1,55 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+android {
+
+    compileSdkVersion versions.compileSdk
+
+    defaultConfig {
+        applicationId "ru.mobileup.rxpagingloading"
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation libraries.kotlinStdLib
+
+    implementation libraries.appCompat
+    implementation libraries.recyclerView
+
+//    implementation libraries.rxPm
+    // Reactive implementation of Presentation Model pattern
+    implementation 'com.github.dmdevgo:rxpm:817f73bf9f2ed19e23f6284ec38a2c565f93e105'
+
+    implementation libraries.rxRelay
+    implementation libraries.rxBinding
+    implementation libraries.rxBindingSwiperefreshlayout
+
+    implementation project(path: ':rxpagingloading')
+}

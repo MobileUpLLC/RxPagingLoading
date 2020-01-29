@@ -1,0 +1,66 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+android {
+
+    defaultConfig {
+        minSdkVersion versions.minSdk
+        compileSdkVersion versions.compileSdk
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    testImplementation libraries.junitKotlin
+    testImplementation libraries.mockitoKotlin
+    testImplementation libraries.rxRelay
+
+    implementation libraries.kotlinStdLib
+    implementation libraries.rxAndroid
+    api libraries.rxJava
+}
+
+ext {
+
+    bintrayRepo = "RxPagingLoading"
+    bintrayName = "RxPagingLoading"
+
+    publishedGroupId = 'ru.mobileup'
+    libraryName = 'RxPagingLoading'
+    artifact = 'rxpagingloading'
+
+    libraryDescription = 'Reactive paging and loading data library'
+
+    siteUrl = 'https://github.com/MobileUpLLC/RxPagingLoading/'
+    gitUrl = 'https://github.com/MobileUpLLC/RxPagingLoading.git'
+
+    libraryVersion = '1.0.0'
+
+    developerId = 'MobileUp'
+    developerName = 'MobileUp'
+    developerEmail = 'dev@mobileup.ru'
+
+    licenseName = 'The MIT License'
+    licenseUrl = 'https://github.com/MobileUpLLC/RxPagingLoading/blob/develop/LICENSE'
+    allLicenses = ["MIT"]
+}
+
+//Add these lines to publish library to bintray.
+//Place it at the end of the file
+
+apply from: 'install.gradle'
+apply from: 'bintray.gradle'
