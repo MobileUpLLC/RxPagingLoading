@@ -1,16 +1,18 @@
-# Reactive Paging Loading Content Error (PLCE)
+# Reactive Paging and Loading
 
-This library implements reactive paging and data loading.
-It solves a LCE-state problem and implements a pagination. The basis of this solution is the usage of Unidirectional Data Flow pattern. This library depends on RxJava and uses its interfaces like `Observable` and `Consumer` to represent API.
+This library implements reactive paging and loading. 
+It helps to handle the states of loading a simple data (LCE, loading/content/error) or the complex states of lists with pagination (PLCE, paging/loading/content/error). The solution is based on the usage of Unidirectional Data Flow pattern.
 
-## Simple data loading
+The library depends on RxJava, so you will find familiar interfaces in it's API.
 
-There is an interface `Loading`, that looks as follows:
+## Loading a simple data
+
+`Loading` interface looks as follows:
 
 ```Kotlin
 interface Loading<T> {
 
-    enum class Action { REFRESH }
+    enum class Action { REFRESH, FORCE_REFRESH }
 
     val state: Observable<State<T>>
 
@@ -25,15 +27,16 @@ interface Loading<T> {
 ```
 
 It includes:
-- `State` — represents LCE-state.
-- `Observable` - observes changes of the LCE-state.
-- `Consumer` - receives appropriate Action.
+- `State` class — represents LCE state.
+- `Action` enum - the possible actions.
+- `state: Observable` - observes changes of the LCE state.
+- `actions: Consumer` - receives performed Action.
 
-There are two implementations:
+There are two implementations of this interface:
 
-- LoadingOrdinary
+### LoadingOrdinary
 
-This class takes a data source as a Single into the constructor:
+This class is for simple case when at first load or after refresh content comes from `Single` data source, passed into the constructor:
 
 ```Kotlin
 LoadingOrdinary(
@@ -41,9 +44,9 @@ LoadingOrdinary(
 )
 ```
 
-- LoadingAssembled
+### LoadingAssembled
 
-This implementation is used when there is a `Сompletable` for updating data and a separate stream for receiving data:
+This implementation is for case when there is a separate `Сompletable` to refresh the content and an `Observable` stream for receiving this content updates:
 
 ```Kotlin
 LoadingAssembled(
@@ -54,12 +57,12 @@ LoadingAssembled(
 
 ## Paging
 
-The `Paging` interface looks a bit more complicated. In addition to the LCE-state, it includes a paging state:
+The `Paging` interface looks a bit more complicated. In addition to the LCE, it has the paging states:
 
 ```Kotlin
 interface Paging<T> {
 
-    enum class Action { REFRESH, LOAD_NEXT_PAGE }
+    enum class Action { REFRESH, FORCE_REFRESH, LOAD_NEXT_PAGE }
 
     val state: Observable<State<T>>
 
@@ -84,12 +87,11 @@ interface Paging<T> {
 }
 ```
 
-Note, the `State` also stores the last loaded page. It is needed to download the following page, as well as to determine the end of the list.
+Note, the `State` also stores the last loaded page. It is used to download the following page, as well as to determine the end of the list.
 
-`Page` is an interface which is made for flexibility. Your data source can map a page data to the own class. For example, you can wish to store an identifier of the last entity, or a link to the next page, or any data depending on your back-end requirements. The last page will be passed to a lambda `pageSource`, which should be passed to the constructor of the `PagingImpl`:
+`Page` is an interface made for flexibility. Your data source can map a page data to it's own class. For example, you can store an identifier of the last entity, or a link to the next page, or any data depending on your back-end requirements. The last page will be passed to a lambda `pageSource` from the constructor of the `PagingImpl`:
 
 ```Kotlin
-
 class PageInfo(
     override val items: List<Item>,
     override val isEndReached: Boolean
@@ -112,7 +114,9 @@ PagingImpl(
 ```
 
 ## Display the state
-We recommend converting the resulting PLCE or LCE state to the corresponding state for the screen. In the PLCE-pm module, we use the RxPM library integration to map the current state to the screen state. More details you can see in the [sample](https://github.com/MobileUpLLC/RxPLCE/tree/develop/sample).
+You can just use the resulting PLCE or LCE state to render your screen UI. Or you can use extensions from `LoadingExtensions.kt` and `PagingExtensions.kt` to observe individual state parts changes. It's helpful when you don't need all of the states or use with MVVM-like pattern. 
+
+In the [sample](https://github.com/MobileUpLLC/RxPagingLoading/tree/develop/sample) we use the [RxPM](https://github.com/dmdevgo/RxPM/tree/develop/rxpm) library and extensions to split resulting state to the Presentation Model states.
 
 ## License
 ```
