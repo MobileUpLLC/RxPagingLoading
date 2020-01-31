@@ -1,6 +1,7 @@
 # Reactive Paging and Loading
 
 [ ![Download](https://api.bintray.com/packages/1117847002272/RxPagingLoading/RxPagingLoading/images/download.svg?version=1.0.0) ](https://bintray.com/1117847002272/RxPagingLoading/RxPagingLoading/1.0.0/link)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-RxPagingLoading-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/8035)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This library implements reactive paging and loading. 
