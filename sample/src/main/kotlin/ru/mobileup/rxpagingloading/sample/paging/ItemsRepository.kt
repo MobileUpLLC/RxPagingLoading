@@ -21,7 +21,7 @@ class ItemsRepository {
         return Single.just(Unit)
             .delay(3, TimeUnit.SECONDS)
             .map {
-                if (mode == Mode.NORMAL) {
+                if (mode == Mode.NORMAL || mode == Mode.RANDOM_ERROR) {
                     List(limit) { index ->
                         Item(number = (last?.number ?: 0) + index + 1)
                     }.filter { it.number <= totalCount }
