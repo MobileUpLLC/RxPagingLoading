@@ -68,7 +68,7 @@ class PagingPm(repository: ItemsRepository) :PresentationModel() {
 
         paging.errorChanges()
             .subscribe {
-                if (content.valueOrNull.isNullOrEmpty().not()) {
+                if (content.valueOrNull != null) {
                     showError.consumer.accept("Refreshing Error")
                 }
             }
