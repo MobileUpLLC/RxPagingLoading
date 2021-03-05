@@ -1,6 +1,6 @@
 # Reactive Paging and Loading
 
-[ ![Download](https://api.bintray.com/packages/1117847002272/RxPagingLoading/RxPagingLoading/images/download.svg?version=1.0.0) ](https://bintray.com/1117847002272/RxPagingLoading/RxPagingLoading/1.0.0/link)
+[![Maven Central](https://img.shields.io/maven-central/v/ru.mobileup/rxpagingloading)](https://repo1.maven.org/maven2/ru/mobileup/rxpagingloading)
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-RxPagingLoading-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/8035)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -16,7 +16,7 @@ The library depends on RxJava, so you will find familiar interfaces in it's API.
 Add the dependency to your build.gradle:
 ```Groovy
 dependencies {
-    implementation 'ru.mobileup:rxpagingloading:1.0.0'
+    implementation 'ru.mobileup:rxpagingloading:1.0.1'
 }
 ```
 
