@@ -1,7 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'com.jfrog.bintray'
-apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'org.jetbrains.dokka'
 
 android {
 
@@ -34,33 +33,4 @@ dependencies {
     api libraries.rxJava
 }
 
-ext {
-
-    bintrayRepo = "RxPagingLoading"
-    bintrayName = "RxPagingLoading"
-
-    publishedGroupId = 'ru.mobileup'
-    libraryName = 'RxPagingLoading'
-    artifact = 'rxpagingloading'
-
-    libraryDescription = 'Reactive paging and loading data library'
-
-    siteUrl = 'https://github.com/MobileUpLLC/RxPagingLoading/'
-    gitUrl = 'https://github.com/MobileUpLLC/RxPagingLoading.git'
-
-    libraryVersion = '1.0.0'
-
-    developerId = 'MobileUp'
-    developerName = 'MobileUp'
-    developerEmail = 'dev@mobileup.ru'
-
-    licenseName = 'The MIT License'
-    licenseUrl = 'https://github.com/MobileUpLLC/RxPagingLoading/blob/develop/LICENSE'
-    allLicenses = ["MIT"]
-}
-
-//Add these lines to publish library to bintray.
-//Place it at the end of the file
-
-apply from: 'install.gradle'
-apply from: 'bintray.gradle'
+apply from: "${rootDir}/publish.gradle"
