@@ -43,10 +43,7 @@ dependencies {
     implementation libraries.appCompat
     implementation libraries.recyclerView
 
-//    implementation libraries.rxPm
-    // Reactive implementation of Presentation Model pattern
-    implementation 'com.github.dmdevgo:rxpm:817f73bf9f2ed19e23f6284ec38a2c565f93e105'
-
+    implementation libraries.rxPm
     implementation libraries.rxRelay
     implementation libraries.rxBinding
     implementation libraries.rxBindingSwiperefreshlayout
